@@ -38,7 +38,10 @@ export default class Board extends React.Component {
     return <ul>
       { 
         this.state.log.map(event => {
-          return <li>{ event }</li>
+          if(typeof event === "string")
+            return <li>{ event }</li>
+          else
+            return this.renderEvent(event)
         }) 
       }
     </ul>
