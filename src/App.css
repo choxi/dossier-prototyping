@@ -1,0 +1,20 @@
+.Board {
+  width: 501px;
+  height: 501px;
+  background-color: transparent;
+  background-size: 50px 50px;
+  background-image: linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px);
+}
+
+#content{
+  height:100%;
+  background-size:50px 50px;
+}
+
+.follow-me {
+  position:absolute;
+  bottom:10px;
+  right:10px;
+  text-decoration: none;
+  color: #FFFFFF;
+}
