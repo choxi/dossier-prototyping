@@ -10,7 +10,10 @@ export default class Board extends React.Component {
     this.state = { 
       notes: List([
         { id: 1, x: 0, y: 0, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
-        { id: 2, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" }
+        { id: 2, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
+        { id: 3, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
+        { id: 4, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
+        { id: 5, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" }
       ]) 
     }
   }

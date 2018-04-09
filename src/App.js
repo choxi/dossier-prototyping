@@ -1,7 +1,7 @@
 import React from "react"
 import Zoom from "./playgrounds/Zoom"
 import Piles from "./playgrounds/Piles"
-import "./App.css"
+import "./App.scss"
 
 export default class App extends React.Component {
   render() {

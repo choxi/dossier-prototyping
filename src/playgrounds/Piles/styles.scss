@@ -6,10 +6,11 @@ html, body {
 .Note {
   width: 300px;
   position: absolute;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 
   img {
     width: 100%;
-    border: 2px solid #666;
+    border: 1px solid #DDD;
   }
 }
 
