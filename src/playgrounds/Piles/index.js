@@ -4,7 +4,7 @@ import "./styles.scss"
 
 export default class Piles extends React.Component {
   render() {
-    return <div>
+    return <div className="Piles">
       <Board />
     </div>
   }

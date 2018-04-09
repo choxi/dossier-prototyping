@@ -16,6 +16,9 @@ export default class Board extends React.Component {
   }
 
   handlePan(note, event) {
+    event.preventDefault()
+    event.srcEvent.preventDefault()
+
     let notes = this.state.notes
 
     let index = notes.findIndex(n => n.id === note.id)
@@ -39,12 +42,14 @@ export default class Board extends React.Component {
 
   render() {
     let notes = this.state.notes.map(note => {
+      let options = { preventDefault: true }
+
       let style = { 
         left: note.x + note.deltaX,
         top: note.y + note.deltaY
       }
 
-      return <Hammer key={ note.id } onPan={ event => this.handlePan(note, event) } onPanEnd={ event => this.handlePanEnd(note, event) }>
+      return <Hammer options={ options } key={ note.id } onPan={ event => this.handlePan(note, event) } onPanEnd={ event => this.handlePanEnd(note, event) }>
         <div className="Note" style={ style }>
           <img src={ note.imgSrc } />
         </div>
