@@ -3,16 +3,14 @@ import Note from "./Note"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
 
-import "./styles.css"
-
 export default class Board extends React.Component {
   constructor() {
     super()
 
     this.state = { 
       notes: List([
-        { id: 1, x: 0, y: 0, deltaX: 0, deltaY: 0 },
-        { id: 2, x: 100, y: 100, deltaX: 0, deltaY: 0 }
+        { id: 1, x: 0, y: 0, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
+        { id: 2, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" }
       ]) 
     }
   }
@@ -48,6 +46,7 @@ export default class Board extends React.Component {
 
       return <Hammer key={ note.id } onPan={ event => this.handlePan(note, event) } onPanEnd={ event => this.handlePanEnd(note, event) }>
         <div className="Note" style={ style }>
+          <img src={ note.imgSrc } />
         </div>
       </Hammer>
     })

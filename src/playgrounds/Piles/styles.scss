@@ -1,8 +1,11 @@
 .Note {
-  width: 100px;
-  height: 100px;
-  background: blue;
+  width: 300px;
   position: absolute;
+
+  img {
+    width: 100%;
+    border: 2px solid #666;
+  }
 }
 
 .Board {
