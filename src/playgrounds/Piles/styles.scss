@@ -1,32 +1,21 @@
-html, body {
-  margin: 0;
-  padding: 0;
-}
+.Piles { 
+  .Note {
+    width: 300px;
+    position: absolute;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 
-.Note {
-  width: 300px;
-  position: absolute;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-
-  img {
-    width: 100%;
-    border: 1px solid #DDD;
+    img {
+      width: 100%;
+      border: 1px solid #DDD;
+    }
   }
-}
 
-body {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  overflow: hidden;
-}
-
-.Board {
-  width: 100% !important;
-  height: 100% !important;
-  touch-action: none !important;
-  box-sizing: border-box;
-  margin: 0;
+  .Board {
+    width: 100% !important;
+    height: 100% !important;
+    touch-action: none !important;
+    box-sizing: border-box;
+    margin: 0;
+    position: relative;
+  }
 }
