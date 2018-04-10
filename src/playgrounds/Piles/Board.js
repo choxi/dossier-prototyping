@@ -1,5 +1,4 @@
 import React from "react"
-import Note from "./Note"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
 
@@ -37,10 +36,30 @@ export default class Board extends React.Component {
 
     let newX = note.x + note.deltaX
     let newY = note.y + note.deltaY
+
     let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
     let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes })
+    this.setState({ notes: newNotes }, () => this.handleMomentum(note, event.velocityX, event.velocityY))
+  }
+
+  handleMomentum(note, velocityX, velocityY, deceleration=1.0) {
+    if(deceleration <= 0.0)
+      return
+   
+    let notes = this.state.notes
+    note = notes.find(n => n.id === note.id)
+    let index = notes.findIndex(n => n.id === note.id)
+
+    let newX = note.x + velocityX * 2
+    let newY = note.y + velocityY * 2
+
+    let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
+    let newNotes = notes.set(index, newNote)
+
+    this.setState({ notes: newNotes }, () => {
+      setTimeout(() => this.handleMomentum(note, velocityX, velocityY, deceleration -+ 0.1), 5)
+    })
   }
 
   render() {
