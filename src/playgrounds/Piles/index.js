@@ -5,7 +5,7 @@ import "./styles.scss"
 export default class Piles extends React.Component {
   render() {
     return <div className="Piles">
-      <Board />
+      <Board showTools={ this.props.showTools } />
     </div>
   }
 }
