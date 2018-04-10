@@ -1,12 +1,16 @@
 import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
+import Slider from "react-rangeslider"
+import "react-rangeslider/lib/index.css"
 
 export default class Board extends React.Component {
   constructor() {
     super()
 
     this.state = { 
+      decelerationFactor: 0.1,
+      sensitivity: 5,
       notes: List([
         { id: 1, x: 0, y: 0, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
         { id: 2, x: 100, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
@@ -44,21 +48,22 @@ export default class Board extends React.Component {
   }
 
   handleMomentum(note, velocityX, velocityY, deceleration=1.0) {
-    if(deceleration <= 0.0)
+    if(deceleration <= 0.1)
       return
    
     let notes = this.state.notes
     note = notes.find(n => n.id === note.id)
     let index = notes.findIndex(n => n.id === note.id)
 
-    let newX = note.x + velocityX * 2
-    let newY = note.y + velocityY * 2
+    let newX = note.x + velocityX * this.state.sensitivity
+    let newY = note.y + velocityY * this.state.sensitivity
 
     let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
     let newNotes = notes.set(index, newNote)
 
     this.setState({ notes: newNotes }, () => {
-      setTimeout(() => this.handleMomentum(note, velocityX, velocityY, deceleration -+ 0.1), 5)
+      deceleration = deceleration * (1 - this.state.decelerationFactor)
+      setTimeout(() => this.handleMomentum(note, velocityX, velocityY, deceleration), 1)
     })
   }
 
@@ -78,8 +83,17 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
-    return <div className="Board">
-      { notes }
+    return <div>
+      <div className="Board__variables">
+        <h5>Momentum Sensitivity</h5>
+        <Slider min={ 0 } max={ 10 } step={ 0.1 } value={ this.state.sensitivity } onChange={ value => this.setState({ sensitivity: value }) } />
+        <h5>Momentum Deceleration</h5>
+        <Slider min={ 0.01 } max={ 0.5 } step={ 0.01 } value={ this.state.decelerationFactor } onChange={ value => this.setState({ decelerationFactor: value }) } />
+      </div>
+
+      <div className="Board">
+        { notes }
+      </div>
     </div>
   }
 }
