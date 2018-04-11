@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Link } from "react-router-dom"
 import Hammer from "react-hammerjs"
 
 import Zoom from "./playgrounds/Zoom"
-import Piles from "./playgrounds/Piles"
+import Momentum from "./playgrounds/Momentum"
 import Grouping from "./playgrounds/Grouping"
 
 import "./App.scss"
@@ -20,7 +20,7 @@ export default class App extends React.Component {
     if(this.state.showTools)
       navigation = <div className="App__navigation">
         <ul>
-          <li><Link to="/piles">Piles</Link></li>
+          <li><Link to="/momentum">Momentum</Link></li>
           <li><Link to="/zoom">Zoom</Link></li>
           <li><Link to="/grouping">Grouping</Link></li>
         </ul>
@@ -31,7 +31,7 @@ export default class App extends React.Component {
       <div className="App">
         { navigation }
         <div className="App__body">
-          <Route path="/piles" render={ () => <Piles showTools={ this.state.showTools } /> } />
+          <Route path="/momentum" render={ () => <Momentum showTools={ this.state.showTools } /> } />
           <Route path="/zoom" component={ Zoom } />
           <Route path="/grouping" component={ Grouping } />
 

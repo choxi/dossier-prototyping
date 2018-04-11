@@ -4,7 +4,7 @@ import "./styles.scss"
 
 export default class Grouping extends React.Component {
   render() {
-    return <div className="Piles">
+    return <div className="Grouping">
       <GroupingBoard showTools={ this.props.showTools } />
     </div>
   }
