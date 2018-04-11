@@ -38,6 +38,7 @@ export default class App extends React.Component {
           <Route path="/momentum" render={ () => <Momentum showTools={ this.state.showTools } /> } />
           <Route path="/zoom" component={ Zoom } />
           <Route path="/grouping" component={ Grouping } />
+          <Route path="/grouping2" component={ Grouping2 } />
           <Route path="/grouping3" component={ Grouping3 } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
