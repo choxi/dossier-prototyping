@@ -4,17 +4,7 @@ import { List } from "immutable"
 import Slider from "react-rangeslider"
 import "react-rangeslider/lib/index.css"
 
-const doubleTapOptions = {
-  recognizers: {
-    tap: {
-      taps: 2,
-      threshold: 10,
-      posThreshold: 20
-    }
-  }
-}
-
-export default class Board extends React.Component {
+export default class GroupingBoard extends React.Component {
   constructor() {
     super()
 
@@ -24,17 +14,17 @@ export default class Board extends React.Component {
       notes: List([
         { grouped: false, id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
         { grouped: false, id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
-        { id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
-        { id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
-        { id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
-        { id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
-        { id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
-        { id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
-        { id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
-        { id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
-        { id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
-        { id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
-        { id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
+        { grouped: false, id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
+        { grouped: false, id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
+        { grouped: false, id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
+        { grouped: false, id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
+        { grouped: false, id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
+        { grouped: false, id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
+        { grouped: false, id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
+        { grouped: false, id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
+        { grouped: false, id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
+        { grouped: false, id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
+        { grouped: false, id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
       ])
     }
 
@@ -128,14 +118,14 @@ export default class Board extends React.Component {
   }
 
   handleDoubleTap(note, event) {
+    console.log("double tap")
+
     let notes = this.state.notes
     let index = notes.findIndex(n => n.id === note.id)
     let newNote = Object.assign({}, note, { grouped: !note.grouped })
     let newNotes = notes.set(index, newNote)
 
     this.setState({ notes: newNotes })
-
-    return false
   }
 
   cancelGroup(event) {
@@ -155,6 +145,16 @@ export default class Board extends React.Component {
   }
 
   render() {
+    let doubleTapOptions = {
+      recognizers: {
+        tap: {
+          taps: 2,
+          threshold: 10,
+          posThreshold: 20
+        }
+      }
+    }
+
     let notes = this.state.notes.map(note => {
       let style = {
         left: note.x + note.deltaX,

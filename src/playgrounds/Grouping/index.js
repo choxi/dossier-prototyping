@@ -1,11 +1,11 @@
 import React from "react"
-import Board from "./Board"
+import GroupingBoard from "./GroupingBoard"
 import "./styles.scss"
 
 export default class Grouping extends React.Component {
   render() {
     return <div className="Piles">
-      <Board showTools={ this.props.showTools } />
+      <GroupingBoard showTools={ this.props.showTools } />
     </div>
   }
 }
