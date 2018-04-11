@@ -6,6 +6,7 @@ import Zoom from "./playgrounds/Zoom"
 import Momentum from "./playgrounds/Momentum"
 import Grouping from "./playgrounds/Grouping"
 import Grouping2 from "./playgrounds/Grouping2"
+import Grouping3 from "./playgrounds/Grouping3"
 
 import "./App.scss"
 import 'font-awesome/css/font-awesome.min.css'
@@ -25,6 +26,7 @@ export default class App extends React.Component {
           <li><Link to="/zoom">Zoom</Link></li>
           <li><Link to="/grouping">Grouping</Link></li>
           <li><Link to="/grouping2">Grouping2</Link></li>
+          <li><Link to="/grouping3">Grouping3</Link></li>
         </ul>
       </div>
 
@@ -36,7 +38,7 @@ export default class App extends React.Component {
           <Route path="/momentum" render={ () => <Momentum showTools={ this.state.showTools } /> } />
           <Route path="/zoom" component={ Zoom } />
           <Route path="/grouping" component={ Grouping } />
-          <Route path="/grouping2" component={ Grouping2 } />
+          <Route path="/grouping3" component={ Grouping3 } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">
