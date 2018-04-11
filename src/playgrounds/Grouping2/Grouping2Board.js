@@ -3,6 +3,7 @@ import Hammer from "react-hammerjs"
 import { List } from "immutable"
 import Slider from "react-rangeslider"
 import "react-rangeslider/lib/index.css"
+import uuid from "uuid/v4"
 
 export default class GroupingBoard extends React.Component {
   constructor() {
@@ -11,20 +12,21 @@ export default class GroupingBoard extends React.Component {
     this.state = {
       decelerationFactor: 0.1,
       sensitivity: 10,
+      activeNote: null,
       notes: List([
-        { grouped: false, id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
-        { grouped: false, id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
-        { grouped: false, id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
-        { grouped: false, id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
-        { grouped: false, id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
-        { grouped: false, id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
-        { grouped: false, id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
-        { grouped: false, id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
-        { grouped: false, id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
-        { grouped: false, id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
-        { grouped: false, id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
-        { grouped: false, id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
-        { grouped: false, id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
+        { groupId: null, id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
+        { groupId: null, id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
+        { groupId: null, id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
+        { groupId: null, id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
+        { groupId: null, id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
+        { groupId: null, id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
+        { groupId: null, id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
+        { groupId: null, id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
+        { groupId: null, id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
+        { groupId: null, id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
+        { groupId: null, id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
+        { groupId: null, id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
+        { groupId: null, id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
       ])
     }
 
@@ -39,23 +41,25 @@ export default class GroupingBoard extends React.Component {
     event.preventDefault()
     event.srcEvent.preventDefault()
 
-    let noteGroup = this.noteGroup(note)
-    let notes = this.state.notes
-    let newNotes = this.state.notes
+    this.setState({ activeNote: note }, () => {
+      let noteGroup = this.noteGroup(note)
+      let notes = this.state.notes
+      let newNotes = this.state.notes
 
-    noteGroup.forEach(groupedNote => {
-      let index = notes.findIndex(n => n.id === groupedNote.id)
-      let newNote = Object.assign({}, groupedNote, { grouped: true, deltaX: event.deltaX, deltaY: event.deltaY })
+      noteGroup.forEach(groupedNote => {
+        let index = notes.findIndex(n => n.id === groupedNote.id)
+        let newNote = Object.assign({}, groupedNote, { deltaX: event.deltaX, deltaY: event.deltaY })
 
-      newNotes = newNotes.set(index, newNote)
+        newNotes = newNotes.set(index, newNote)
+      })
+
+      this.setState({ notes: newNotes })
     })
-
-    this.setState({ notes: newNotes })
   }
 
   noteGroup(note) {
-    if(note.grouped)
-      return this.state.notes.filter(note => note.grouped)
+    if(note.groupId)
+      return this.state.notes.filter(n => n.groupId === note.groupId)
     else
       return [ note ]
   }
@@ -82,14 +86,22 @@ export default class GroupingBoard extends React.Component {
 
     noteGroup.forEach(groupedNote => {
       let index = notes.findIndex(n => n.id === groupedNote.id)
-      let newX = groupedNote.x + groupedNote.deltaX
-      let newY = groupedNote.y + groupedNote.deltaY
-      let newNote = Object.assign({}, groupedNote, { grouped: false, x: newX, y: newY, deltaX: 0, deltaY: 0 })
+
+      let newX, newY
+      if(groupedNote.panOffset) {
+        newX = groupedNote.x + groupedNote.deltaX - groupedNote.panOffset.x
+        newY = groupedNote.y + groupedNote.deltaY - groupedNote.panOffset.y
+      } else {
+        newX = groupedNote.x + groupedNote.deltaX
+        newY = groupedNote.y + groupedNote.deltaY
+      }
+
+      let newNote = Object.assign({}, groupedNote, { groupId: null, panOffset: null, x: newX, y: newY, deltaX: 0, deltaY: 0 })
 
       newNotes = newNotes.set(index, newNote)
     })
 
-    this.setState({ notes: newNotes }, () => this.handleMomentum(note, event.velocityX, event.velocityY))
+    this.setState({ activeNote: null, notes: newNotes }, () => this.handleMomentum(note, event.velocityX, event.velocityY))
   }
 
   handleMomentum(note, velocityX, velocityY, deceleration=1.0) {
@@ -118,13 +130,36 @@ export default class GroupingBoard extends React.Component {
   }
 
   handleTap(note, event) {
-    let groupedNotes = this.state.notes.filter(n => n.grouped)
+    if(this.state.activeNote && note.groupId) {
+      let index = this.state.notes.findIndex(n => n.id === note.id)
 
-    if(groupedNotes.size > 0) {
-      let notes = this.state.notes
-      let index = notes.findIndex(n => n.id === note.id)
-      let newNote = Object.assign({}, note, { grouped: !note.grouped })
-      let newNotes = notes.set(index, newNote)
+      let newX, newY
+      if(note.panOffset) {
+        newX = note.x + note.deltaX - note.panOffset.x
+        newY = note.y + note.deltaY - note.panOffset.y
+      } else {
+        newX = note.x + note.deltaX
+        newY = note.y + note.deltaY
+      }
+
+      let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0, groupId: null, panOffset: null })
+      let newNotes =  this.state.notes.set(index, newNote)
+
+      this.setState({ notes: newNotes })
+    } else if(this.state.activeNote) {
+      let index, newNote, newNotes = this.state.notes
+      let activeNote = this.state.activeNote
+
+      if(!activeNote.groupId) {
+        index = newNotes.findIndex(n => n.id === activeNote.id)
+        activeNote = Object.assign({}, activeNote, { groupId: uuid() })
+        newNotes = newNotes.set(index, activeNote)
+      }
+
+      index = newNotes.findIndex(n => n.id === note.id)
+      let panOffset = { x: activeNote.deltaX, y: activeNote.deltaY }
+      newNote = Object.assign({}, note, { groupId: activeNote.groupId, deltaX: activeNote.deltaX, deltaY: activeNote.deltaY, panOffset: panOffset })
+      newNotes = newNotes.set(index, newNote)
 
       this.setState({ notes: newNotes })
     }
@@ -148,12 +183,22 @@ export default class GroupingBoard extends React.Component {
 
   render() {
     let notes = this.state.notes.map(note => {
-      let style = {
-        left: note.x + note.deltaX,
-        top: note.y + note.deltaY
-      }
+      let style
+      if(note.panOffset)
+        style  = {
+          left: note.x + note.deltaX - note.panOffset.x,
+          top: note.y + note.deltaY - note.panOffset.y
+        }
+      else
+        style  = {
+          left: note.x + note.deltaX,
+          top: note.y + note.deltaY
+        }
 
-      let groupedClasses = note.grouped ? "Note--grouped" : ""
+      let groupedClasses
+      if(this.state.activeNote && this.state.activeNote.groupId && this.state.activeNote.groupId === note.groupId)
+        groupedClasses = "Note--grouped"
+
       let notePartial
       if(note.imgSrc)
         notePartial = <div className={ "Note Note--image " + groupedClasses } style={ style }>
