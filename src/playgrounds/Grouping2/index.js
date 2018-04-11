@@ -1,8 +1,8 @@
 import React from "react"
-import MomentumBoard from "./MomentumBoard"
+import Grouping2Board from "./Grouping2Board"
 import "./styles.scss"
 
-export default class Momentum extends React.Component {
+export default class Grouping2 extends React.Component {
   constructor() {
     super()
     this.touchOverride = function (event) { event.preventDefault() }.bind(this)
@@ -17,8 +17,8 @@ export default class Momentum extends React.Component {
   }
 
   render() {
-    return <div className="Momentum">
-      <MomentumBoard showTools={ this.props.showTools } />
+    return <div className="Grouping">
+      <Grouping2Board showTools={ this.props.showTools } />
     </div>
   }
 }

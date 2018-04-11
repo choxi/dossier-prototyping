@@ -12,9 +12,9 @@ html, body {
 }
 
 .App__navigation {
-  width: 100px;
   background: #DDD;
   height: 100%;
+  padding-right: 1em;
 
   ul {
     list-style: none;
@@ -46,8 +46,8 @@ html, body {
 }
 
 .Board {
-  width: 251px;
-  height: 251px;
+  width: 451px;
+  height: 451px;
   background-color: transparent;
   background-size: 50px 50px;
   background-image: linear-gradient(to right, $grid-color 1px, transparent 1px), linear-gradient(to bottom, $grid-color 1px, transparent 1px);

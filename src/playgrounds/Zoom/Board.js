@@ -12,13 +12,15 @@ export default class Board extends React.Component {
   }
 
   handlePinch(event) {
-    let scale = this.props.zoomSnap ? this.roundPoint5(event.scale) : event.scale
+    let scale = this.props.zoomSnap ? this.round(event.scale) : event.scale
     this.setState({ zoomFactor: scale })
   }
 
-  roundPoint5(number) {
+  round(number) {
     number = number * 10
-    number = Math.ceil(number / 5) * 5
+
+    number = Math.floor(number / this.props.zoomSnap ) * this.props.zoomSnap
+
     return number / 10
   }
 
@@ -75,8 +77,6 @@ export default class Board extends React.Component {
         <div className="Board" style={{ zoom: this.state.zoom * this.state.zoomFactor }}>
         </div>
       </Hammer>
-
-      <div>Log: { this.renderLog() }</div>
     </div>
   }
 }
