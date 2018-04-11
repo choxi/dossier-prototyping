@@ -4,6 +4,7 @@ import Hammer from "react-hammerjs"
 
 import Zoom from "./playgrounds/Zoom"
 import Piles from "./playgrounds/Piles"
+import Grouping from "./playgrounds/Grouping"
 
 import "./App.scss"
 import 'font-awesome/css/font-awesome.min.css'
@@ -21,6 +22,7 @@ export default class App extends React.Component {
         <ul>
           <li><Link to="/piles">Piles</Link></li>
           <li><Link to="/zoom">Zoom</Link></li>
+          <li><Link to="/grouping">Grouping</Link></li>
         </ul>
       </div>
 
@@ -31,6 +33,7 @@ export default class App extends React.Component {
         <div className="App__body">
           <Route path="/piles" render={ () => <Piles showTools={ this.state.showTools } /> } />
           <Route path="/zoom" component={ Zoom } />
+          <Route path="/grouping" component={ Grouping } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">
