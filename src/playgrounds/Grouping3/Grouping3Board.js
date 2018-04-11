@@ -86,9 +86,17 @@ export default class GroupingBoard extends React.Component {
 
     noteGroup.forEach(groupedNote => {
       let index = notes.findIndex(n => n.id === groupedNote.id)
-      let newX = groupedNote.x + groupedNote.deltaX
-      let newY = groupedNote.y + groupedNote.deltaY
-      let newNote = Object.assign({}, groupedNote, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
+
+      let newX, newY
+      if(groupedNote.panOffset) {
+        newX = groupedNote.x + groupedNote.deltaX - groupedNote.panOffset.x
+        newY = groupedNote.y + groupedNote.deltaY - groupedNote.panOffset.y
+      } else {
+        newX = groupedNote.x + groupedNote.deltaX
+        newY = groupedNote.y + groupedNote.deltaY
+      }
+
+      let newNote = Object.assign({}, groupedNote, { panOffset: null, x: newX, y: newY, deltaX: 0, deltaY: 0 })
 
       newNotes = newNotes.set(index, newNote)
     })
@@ -124,7 +132,17 @@ export default class GroupingBoard extends React.Component {
   handleTap(note, event) {
     if(this.state.activeNote && note.groupId) {
       let index = this.state.notes.findIndex(n => n.id === note.id)
-      let newNote = Object.assign({}, note, { groupId: null })
+
+      let newX, newY
+      if(note.panOffset) {
+        newX = note.x + note.deltaX - note.panOffset.x
+        newY = note.y + note.deltaY - note.panOffset.y
+      } else {
+        newX = note.x + note.deltaX
+        newY = note.y + note.deltaY
+      }
+
+      let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0, groupId: null, panOffset: null })
       let newNotes =  this.state.notes.set(index, newNote)
 
       this.setState({ notes: newNotes })
@@ -139,7 +157,8 @@ export default class GroupingBoard extends React.Component {
       }
 
       index = newNotes.findIndex(n => n.id === note.id)
-      newNote = Object.assign({}, note, { groupId: activeNote.groupId })
+      let panOffset = { x: activeNote.deltaX, y: activeNote.deltaY }
+      newNote = Object.assign({}, note, { groupId: activeNote.groupId, deltaX: activeNote.deltaX, deltaY: activeNote.deltaY, panOffset: panOffset })
       newNotes = newNotes.set(index, newNote)
 
       this.setState({ notes: newNotes })
@@ -164,10 +183,17 @@ export default class GroupingBoard extends React.Component {
 
   render() {
     let notes = this.state.notes.map(note => {
-      let style = {
-        left: note.x + note.deltaX,
-        top: note.y + note.deltaY
-      }
+      let style
+      if(note.panOffset)
+        style  = {
+          left: note.x + note.deltaX - note.panOffset.x,
+          top: note.y + note.deltaY - note.panOffset.y
+        }
+      else
+        style  = {
+          left: note.x + note.deltaX,
+          top: note.y + note.deltaY
+        }
 
       let groupedClasses
       if(this.state.activeNote && this.state.activeNote.groupId && this.state.activeNote.groupId === note.groupId)
