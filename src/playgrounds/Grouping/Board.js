@@ -4,11 +4,21 @@ import { List } from "immutable"
 import Slider from "react-rangeslider"
 import "react-rangeslider/lib/index.css"
 
+const doubleTapOptions = {
+  recognizers: {
+    tap: {
+      taps: 2,
+      threshold: 10,
+      posThreshold: 20
+    }
+  }
+}
+
 export default class Board extends React.Component {
   constructor() {
     super()
 
-    this.state = { 
+    this.state = {
       decelerationFactor: 0.1,
       sensitivity: 10,
       notes: List([
@@ -25,7 +35,7 @@ export default class Board extends React.Component {
         { id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
         { id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
         { id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
-      ]) 
+      ])
     }
 
     this.noteRefs = {}
@@ -66,7 +76,7 @@ export default class Board extends React.Component {
     let x = note.x + note.deltaX
     let y = note.y + note.deltaY
 
-    if(x < 0 || (x + width) > this.boardRef.current.clientWidth) 
+    if(x < 0 || (x + width) > this.boardRef.current.clientWidth)
       return false
 
     if(y < 0 || (y + height) > this.boardRef.current.clientHeight)
@@ -95,7 +105,7 @@ export default class Board extends React.Component {
   handleMomentum(note, velocityX, velocityY, deceleration=1.0) {
     if(deceleration <= 0.1)
       return
-   
+
     let notes = this.state.notes
     note = notes.find(n => n.id === note.id)
     let newNotes = this.state.notes
@@ -146,9 +156,7 @@ export default class Board extends React.Component {
 
   render() {
     let notes = this.state.notes.map(note => {
-      let options = { preventDefault: true, domEvents: true }
-
-      let style = { 
+      let style = {
         left: note.x + note.deltaX,
         top: note.y + note.deltaY
       }
@@ -164,13 +172,13 @@ export default class Board extends React.Component {
           <h5>{ note.text }</h5>
         </div>
 
-          return <Hammer 
-            ref={ this.noteRefs[note.id] } 
-            options={ options } 
-            key={ note.id } 
-            onPan={ event => this.handlePan(note, event) } 
+          return <Hammer
+            ref={ this.noteRefs[note.id] }
+            options={ doubleTapOptions }
+            key={ note.id }
+            onPan={ event => this.handlePan(note, event) }
             onPanEnd={ event => this.handlePanEnd(note, event) }
-            onDoubleTap={ event => this.handleDoubleTap(note, event) }
+            onTap={ event => this.handleDoubleTap(note, event) }
           >
         { notePartial }
       </Hammer>
@@ -188,7 +196,7 @@ export default class Board extends React.Component {
 
     return <div>
       { tools }
-      <Hammer options={{ domEvents: true }} onDoubleTap={ event => this.cancelGroup(event) }>
+      <Hammer options={ doubleTapOptions } onTap={ event => this.cancelGroup(event) }>
         <div className="Board" ref={ this.boardRef }>
           { notes }
         </div>
