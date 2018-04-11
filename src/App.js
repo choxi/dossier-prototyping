@@ -24,9 +24,9 @@ export default class App extends React.Component {
         <ul>
           <li><Link to="/momentum">Momentum</Link></li>
           <li><Link to="/zoom">Zoom</Link></li>
-          <li><Link to="/grouping">Grouping</Link></li>
-          <li><Link to="/grouping2">Grouping2</Link></li>
-          <li><Link to="/grouping3">Grouping3</Link></li>
+          <li><Link to="/grouping">Group with DTap</Link></li>
+          <li><Link to="/grouping2">Group with MultiSelect</Link></li>
+          <li><Link to="/grouping3">Remember Groups</Link></li>
         </ul>
       </div>
 
