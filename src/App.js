@@ -51,7 +51,7 @@ export default class App extends React.Component {
           <Route path="/grouping4" component={ Grouping4 } />
           <Route path="/grouping5" component={ Grouping5 } />
           <Route path="/whiskyandgin" component={ WhiskyAndGin } />
-          <Route path="/whiskyandgin-proximity" component={ WhiskyAndGin2 } />
+          <Route path="/whiskyandgin-proximity" render={ () => <WhiskyAndGin2 showTools={ this.state.showTools }/> } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">

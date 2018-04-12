@@ -9,8 +9,7 @@ export default class WhiskyAndGinBoard extends React.Component {
   constructor() {
     super()
 
-    this.state = SampleData.cocktails
-
+    this.state = Object.assign({}, SampleData.cocktails, { proximityPadding: 10 })
     this.noteRefs = {}
     this.boardRef = React.createRef()
     this.state.notes.forEach(note => {
@@ -38,9 +37,12 @@ export default class WhiskyAndGinBoard extends React.Component {
     })
   }
 
-  noteGroup(note) {
+  noteGroup(note, notes) {
+    if(!notes)
+      notes = this.state.notes
+
     if(note.groupId)
-      return this.state.notes.filter(n => n.groupId === note.groupId)
+      return notes.filter(n => n.groupId === note.groupId)
     else
       return [ note ]
   }
@@ -63,9 +65,12 @@ export default class WhiskyAndGinBoard extends React.Component {
   notesOverlap(noteA, noteB) {
     let noteARect = this.noteRefs[noteA.id].current.domElement.getBoundingClientRect()
     let noteBRect = this.noteRefs[noteB.id].current.domElement.getBoundingClientRect()
+    let pad = this.state.proximityPadding
 
-    return !( noteARect.right < noteBRect.left || noteARect.left > noteBRect.right || 
-              noteARect.bottom < noteBRect.top || noteARect.top > noteBRect.bottom)
+    return !( (noteARect.right + pad) < noteBRect.left ||
+              (noteARect.left + pad) > noteBRect.right ||
+              (noteARect.bottom + pad) < noteBRect.top ||
+              (noteARect.top + pad) > noteBRect.bottom )
   }
 
   handlePanEnd(note, event) {
@@ -86,13 +91,14 @@ export default class WhiskyAndGinBoard extends React.Component {
       }
 
       let newNote = Object.assign({}, groupedNote, { panOffset: null, x: newX, y: newY, deltaX: 0, deltaY: 0 })
-      note = newNote
       newNotes = newNotes.set(index, newNote)
     })
 
+    note = newNotes.find(n => n.id === note.id)
+
     newNotes.forEach(n => {
       if(n.id === note.id)
-        return 
+        return
 
       if(this.notesOverlap(n, note)) {
         newNotes = this.groupNotes(newNotes, n, note)
@@ -138,9 +144,19 @@ export default class WhiskyAndGinBoard extends React.Component {
   groupNotes(notes, noteA, noteB) {
     let newNotes = notes
 
-    if(noteA.groupId) {
-      newNotes = this.updateNote(newNotes, noteB, { groupId: noteA.groupId })
-    } else {
+    if(noteA.groupId && noteB.groupId && noteA.groupId === noteB.groupId)
+      return newNotes
+
+    if(noteA.groupId)
+      if(noteB.groupId)
+        this.noteGroup(noteB, newNotes).forEach(n => {
+          newNotes = this.updateNote(newNotes, n, { groupId: noteA.groupId })
+        })
+      else
+        newNotes = this.updateNote(newNotes, noteB, { groupId: noteA.groupId })
+    else if(noteB.groupId)
+      newNotes = this.updateNote(newNotes, noteA, { groupId: noteB.groupId })
+    else {
       let groupId = uuid()
       newNotes = this.updateNote(newNotes, noteA, { groupId: groupId })
       newNotes = this.updateNote(newNotes, noteB, { groupId: groupId })
@@ -203,6 +219,8 @@ export default class WhiskyAndGinBoard extends React.Component {
       let groupedClasses
       if(this.state.activeNote && this.state.activeNote.groupId && this.state.activeNote.groupId === note.groupId)
         groupedClasses = "Note--grouped"
+      else if(this.state.activeNote && !(this.state.activeNote.groupId && this.state.activeNote.groupId === note.groupId))
+        groupedClasses = "Note--groupable"
 
       let notePartial
       if(note.imgSrc)
@@ -229,10 +247,8 @@ export default class WhiskyAndGinBoard extends React.Component {
     let tools
     if(this.props.showTools)
       tools = <div className="Board__variables">
-        <h5>Momentum Sensitivity</h5>
-        <Slider min={ 5 } max={ 20 } step={ 0.1 } value={ this.state.sensitivity } onChange={ value => this.setState({ sensitivity: value }) } />
-        <h5>Momentum Deceleration</h5>
-        <Slider min={ 0.001 } max={ 1.0 } step={ 0.001 } value={ this.state.decelerationFactor } onChange={ value => this.setState({ decelerationFactor: value }) } />
+        <h5>Proximity Padding</h5>
+        <Slider min={ 0 } max={ 50 } step={ 10 } value={ this.state.proximityPadding } onChange={ value => this.setState({ proximityPadding: value }) } />
       </div>
 
 
