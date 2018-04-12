@@ -62,15 +62,21 @@ export default class WhiskyAndGinBoard extends React.Component {
     return true
   }
 
-  notesOverlap(noteA, noteB) {
-    let noteARect = this.noteRefs[noteA.id].current.domElement.getBoundingClientRect()
-    let noteBRect = this.noteRefs[noteB.id].current.domElement.getBoundingClientRect()
-    let pad = this.state.proximityPadding
+  notesOverlap(notes, noteA, noteB) {
+    let overlap = false
 
-    return !( (noteARect.right + pad) < noteBRect.left ||
-              (noteARect.left + pad) > noteBRect.right ||
-              (noteARect.bottom + pad) < noteBRect.top ||
-              (noteARect.top + pad) > noteBRect.bottom )
+    this.noteGroup(noteB, notes).forEach(n => {
+      let noteARect = this.noteRefs[noteA.id].current.domElement.getBoundingClientRect()
+      let noteBRect = this.noteRefs[n.id].current.domElement.getBoundingClientRect()
+
+      if (!((noteARect.right < noteBRect.left) ||
+                (noteARect.left > noteBRect.right) ||
+                (noteARect.bottom < noteBRect.top) ||
+                (noteARect.top > noteBRect.bottom)))
+        overlap = true
+    })
+
+    return overlap
   }
 
   handlePanEnd(note, event) {
@@ -95,12 +101,13 @@ export default class WhiskyAndGinBoard extends React.Component {
     })
 
     note = newNotes.find(n => n.id === note.id)
+    let pregrouped = newNotes
 
-    newNotes.forEach(n => {
+    pregrouped.forEach(n => {
       if(n.id === note.id)
         return
 
-      if(this.notesOverlap(n, note)) {
+      if(this.notesOverlap(pregrouped, n, note)) {
         newNotes = this.groupNotes(newNotes, n, note)
       }
     })
