@@ -4,7 +4,7 @@ import Slider from "react-rangeslider"
 import "react-rangeslider/lib/index.css"
 import uuid from "uuid/v4"
 import SampleData from "../../sample-data"
-import { updateNote } from "../../lib/helpers"
+import { updateNote, idToHex } from "../../lib/helpers"
 
 export default class WhiskyAndGinBoard3 extends React.Component {
   constructor() {
@@ -184,6 +184,9 @@ export default class WhiskyAndGinBoard3 extends React.Component {
           left: note.x + note.deltaX,
           top: note.y + note.deltaY
         }
+
+      if(note.groupId)
+        style["borderTop"] = `6px solid ${ idToHex(note.groupId) }`
 
       let groupedClasses = ""
       if(this.state.activeGroup && this.state.activeGroup === note.groupId)
