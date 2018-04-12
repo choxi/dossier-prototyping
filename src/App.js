@@ -11,6 +11,7 @@ import Grouping4 from "./playgrounds/Grouping4"
 import Grouping5 from "./playgrounds/Grouping5"
 import WhiskyAndGin from "./playgrounds/WhiskyAndGin"
 import WhiskyAndGin2 from "./playgrounds/WhiskyAndGin2"
+import WhiskyAndGin3 from "./playgrounds/WhiskyAndGin3"
 
 import "./App.scss"
 import 'font-awesome/css/font-awesome.min.css'
@@ -26,15 +27,19 @@ export default class App extends React.Component {
     if(this.state.showTools)
       navigation = <div className="App__navigation">
         <ul>
-          <li><Link to="/momentum">Momentum</Link></li>
-          <li><Link to="/zoom">Zoom</Link></li>
-          <li><Link to="/grouping">Group with DTap</Link></li>
-          <li><Link to="/grouping2">Group with MultiSelect</Link></li>
-          <li><Link to="/grouping3">Remember Groups</Link></li>
-          <li><Link to="/grouping4">Remember Groups (DTap)</Link></li>
-          <li><Link to="/grouping5">Remember Groups (Long Press)</Link></li>
-          <li><Link to="/whiskyandgin">Whisky and Gin (dtap clusters)</Link></li>
-          <li><Link to="/whiskyandgin-proximity">Whisky and Gin (proximity clusters)</Link></li>
+          <div style={{ display: "none" }}>
+            <li><Link to="/momentum">Momentum</Link></li>
+            <li><Link to="/zoom">Zoom</Link></li>
+            <li><Link to="/grouping">Group with DTap</Link></li>
+            <li><Link to="/grouping2">Group with MultiSelect</Link></li>
+            <li><Link to="/grouping3">Remember Groups</Link></li>
+            <li><Link to="/grouping4">Remember Groups (DTap)</Link></li>
+            <li><Link to="/grouping5">Remember Groups (Long Press)</Link></li>
+          </div>
+
+          <li><Link to="/whiskyandgin">Whisky and Gin - A</Link></li>
+          <li><Link to="/whiskyandgin-proximity">Whisky and Gin - B</Link></li>
+          <li><Link to="/whiskyandgin-press">Whisky and Gin - C</Link></li>
         </ul>
       </div>
 
@@ -52,6 +57,7 @@ export default class App extends React.Component {
           <Route path="/grouping5" component={ Grouping5 } />
           <Route path="/whiskyandgin" component={ WhiskyAndGin } />
           <Route path="/whiskyandgin-proximity" render={ () => <WhiskyAndGin2 showTools={ this.state.showTools }/> } />
+          <Route path="/whiskyandgin-press" render={ () => <WhiskyAndGin3 showTools={ this.state.showTools }/> } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">

@@ -6,11 +6,13 @@ import uuid from "uuid/v4"
 import SampleData from "../../sample-data"
 import { updateNote } from "../../lib/helpers"
 
-export default class WhiskyAndGinBoard extends React.Component {
+export default class WhiskyAndGinBoard3 extends React.Component {
   constructor() {
     super()
 
-    this.state = Object.assign({}, SampleData.cocktails, { proximityPadding: 10 })
+    this.state = SampleData.cocktails
+    this.state.notes.forEach(n => n.anchor = false)
+
     this.noteRefs = {}
     this.boardRef = React.createRef()
     this.state.notes.forEach(note => {
@@ -18,9 +20,17 @@ export default class WhiskyAndGinBoard extends React.Component {
     })
   }
 
+  handlePress(note, event) {
+    let newNotes = updateNote(this.state.notes, note, { groupId: null, anchor: !note.anchor })
+    this.setState({ notes: newNotes })
+  }
+
   handlePan(note, event) {
     event.preventDefault()
     event.srcEvent.preventDefault()
+
+    if(note.anchor)
+      return
 
     this.setState({ activeNote: note }, () => {
       let noteGroup = this.noteGroup(note)
@@ -38,12 +48,9 @@ export default class WhiskyAndGinBoard extends React.Component {
     })
   }
 
-  noteGroup(note, notes) {
-    if(!notes)
-      notes = this.state.notes
-
+  noteGroup(note) {
     if(note.groupId)
-      return notes.filter(n => n.groupId === note.groupId)
+      return this.state.notes.filter(n => n.groupId === note.groupId)
     else
       return [ note ]
   }
@@ -63,24 +70,10 @@ export default class WhiskyAndGinBoard extends React.Component {
     return true
   }
 
-  notesOverlap(notes, noteA, noteB) {
-    let overlap = false
-
-    this.noteGroup(noteB, notes).forEach(n => {
-      let noteARect = this.noteRefs[noteA.id].current.domElement.getBoundingClientRect()
-      let noteBRect = this.noteRefs[n.id].current.domElement.getBoundingClientRect()
-
-      if (!((noteARect.right < noteBRect.left) ||
-                (noteARect.left > noteBRect.right) ||
-                (noteARect.bottom < noteBRect.top) ||
-                (noteARect.top > noteBRect.bottom)))
-        overlap = true
-    })
-
-    return overlap
-  }
-
   handlePanEnd(note, event) {
+    if(note.anchor)
+      return
+
     let notes = this.state.notes
     let noteGroup = this.noteGroup(note)
     let newNotes = this.state.notes
@@ -98,19 +91,8 @@ export default class WhiskyAndGinBoard extends React.Component {
       }
 
       let newNote = Object.assign({}, groupedNote, { panOffset: null, x: newX, y: newY, deltaX: 0, deltaY: 0 })
+
       newNotes = newNotes.set(index, newNote)
-    })
-
-    note = newNotes.find(n => n.id === note.id)
-    let pregrouped = newNotes
-
-    pregrouped.forEach(n => {
-      if(n.id === note.id)
-        return
-
-      if(this.notesOverlap(pregrouped, n, note)) {
-        newNotes = this.groupNotes(newNotes, n, note)
-      }
     })
 
     this.setState({ activeNote: null, notes: newNotes }, () => this.handleMomentum(note, event.velocityX, event.velocityY))
@@ -141,33 +123,28 @@ export default class WhiskyAndGinBoard extends React.Component {
     })
   }
 
-  groupNotes(notes, noteA, noteB) {
-    let newNotes = notes
+  handleTap(note, event) {
+    if(note.anchor)
+      return
 
-    if(noteA.groupId && noteB.groupId && noteA.groupId === noteB.groupId)
-      return newNotes
-
-    if(noteA.groupId)
-      if(noteB.groupId)
-        this.noteGroup(noteB, newNotes).forEach(n => {
-          newNotes = updateNote(newNotes, n, { groupId: noteA.groupId })
-        })
-      else
-        newNotes = updateNote(newNotes, noteB, { groupId: noteA.groupId })
-    else if(noteB.groupId)
-      newNotes = updateNote(newNotes, noteA, { groupId: noteB.groupId })
-    else {
-      let groupId = uuid()
-      newNotes = updateNote(newNotes, noteA, { groupId: groupId })
-      newNotes = updateNote(newNotes, noteB, { groupId: groupId })
+    if(this.state.activeGroup && note.groupId !== this.state.activeGroup) {
+      let index = this.state.notes.findIndex(n => n.id === note.id)
+      let newNote = Object.assign({}, note, { groupId: this.state.activeGroup })
+      let newNotes = this.state.notes.set(index, newNote)
+      this.setState({ notes: newNotes, activeGroup: newNote.groupId })
+    } else if(this.state.activeGroup && note.groupId === this.state.activeGroup) {
+      let index = this.state.notes.findIndex(n => n.id === note.id)
+      let newNote = Object.assign({}, note, { groupId: null })
+      let newNotes = this.state.notes.set(index, newNote)
+      this.setState({ notes: newNotes })
+    } else if(note.groupId) {
+      this.setState({ activeGroup: note.groupId })
+    } else {
+      let index = this.state.notes.findIndex(n => n.id === note.id)
+      let newNote = Object.assign({}, note, { groupId: uuid() })
+      let newNotes = this.state.notes.set(index, newNote)
+      this.setState({ notes: newNotes, activeGroup: newNote.groupId })
     }
-
-    return newNotes
-  }
-
-  handlePress(note, event) {
-    let newNotes = updateNote(this.state.notes, note, { groupId: null })
-    this.setState({ notes: newNotes, activeNote: note })
   }
 
   cancelGroup(event) {
@@ -178,11 +155,20 @@ export default class WhiskyAndGinBoard extends React.Component {
 
   render() {
     let pressOptions = {
+      threshold: 10,
+      time: 300
+    }
+
+    let doubleTapOptions = {
+      taps: 2,
+      threshold: 10,
+      posThreshold: 20
+    }
+
+    let noteGestureOptions = {
       recognizers: {
-        press: {
-          threshold: 10,
-          time: 300
-        }
+        press: pressOptions,
+        tap: doubleTapOptions
       }
     }
 
@@ -196,37 +182,34 @@ export default class WhiskyAndGinBoard extends React.Component {
       else
         style  = {
           left: note.x + note.deltaX,
-          top: note.y + note.deltaY,
-          padding: this.state.proximityPadding
+          top: note.y + note.deltaY
         }
 
-      let groupedClasses
-      if(this.state.activeNote && this.state.activeNote.groupId && this.state.activeNote.groupId === note.groupId)
+      let groupedClasses = ""
+      if(this.state.activeGroup && this.state.activeGroup === note.groupId)
         groupedClasses = "Note--grouped"
-      else if(this.state.activeNote && !(this.state.activeNote.groupId && this.state.activeNote.groupId === note.groupId))
-        groupedClasses = "Note--groupable"
+
+      if(note.anchor)
+        groupedClasses = "Note--anchored"
 
       let notePartial
       if(note.imgSrc)
         notePartial = <div className={ "Note Note--image " + groupedClasses } style={ style }>
-          <div className="Note__body">
-            <img src={ note.imgSrc } />
-          </div>
+          <img src={ note.imgSrc } />
         </div>
        else
         notePartial = <div className={ "Note Note--text " + groupedClasses }  style={ style }>
-          <div className="Note__body">
-            <h5>{ note.text }</h5>
-          </div>
+          <h5>{ note.text }</h5>
         </div>
 
           return <Hammer
             ref={ this.noteRefs[note.id] }
             key={ note.id }
-            options={ pressOptions }
+            options={ noteGestureOptions }
             onPan={ event => this.handlePan(note, event) }
             onPanEnd={ event => this.handlePanEnd(note, event) }
             onPress={ event => this.handlePress(note, event) }
+            onTap={ event => this.handleTap(note, event) }
           >
         { notePartial }
       </Hammer>
@@ -235,16 +218,19 @@ export default class WhiskyAndGinBoard extends React.Component {
     let tools
     if(this.props.showTools)
       tools = <div className="Board__variables">
-        <h5>Proximity Padding</h5>
-        <Slider min={ 0 } max={ 50 } step={ 10 } value={ this.state.proximityPadding } onChange={ value => this.setState({ proximityPadding: value }) } />
+        <h5>Momentum Sensitivity</h5>
+        <Slider min={ 5 } max={ 20 } step={ 0.1 } value={ this.state.sensitivity } onChange={ value => this.setState({ sensitivity: value }) } />
+        <h5>Momentum Deceleration</h5>
+        <Slider min={ 0.001 } max={ 1.0 } step={ 0.001 } value={ this.state.decelerationFactor } onChange={ value => this.setState({ decelerationFactor: value }) } />
       </div>
 
 
     return <div>
-      { tools }
-      <div className="Board" ref={ this.boardRef }>
-        { notes }
-      </div>
+      <Hammer options={{ recognizers: { tap: doubleTapOptions } }} onTap={ event => this.cancelGroup(event) }>
+        <div className="Board" ref={ this.boardRef }>
+          { notes }
+        </div>
+      </Hammer>
     </div>
   }
 }

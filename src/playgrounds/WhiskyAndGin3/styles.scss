@@ -1,0 +1,47 @@
+.Grouping { 
+  .Note {
+    position: absolute;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    z-index: 1;
+
+    img {
+      width: 100%;
+      border: 1px solid #DDD;
+      box-sizing: border-box;
+    }
+  }
+
+  .Note--image {
+    width: 250px;
+  }
+
+  .Note--text {
+    background: white;
+    padding: 0em 1em;
+    color: #333;
+    border: 1px solid #DDD;
+
+    h5 {
+      margin: 0.5em;
+    }
+  }
+
+  .Note--grouped {
+    border: 2px solid #9b59b6;
+  }
+
+  .Note--anchored {
+    box-shadow: none;
+    border: 2px solid #333;
+    z-index: 0;
+  }
+
+  .Board {
+    width: 100% !important;
+    height: 100% !important;
+    touch-action: none !important;
+    box-sizing: border-box;
+    margin: 0;
+    position: relative;
+  }
+}
