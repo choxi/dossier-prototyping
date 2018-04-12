@@ -203,7 +203,8 @@ export default class WhiskyAndGinBoard extends React.Component {
       else
         style  = {
           left: note.x + note.deltaX,
-          top: note.y + note.deltaY
+          top: note.y + note.deltaY,
+          padding: this.state.proximityPadding
         }
 
       let groupedClasses
@@ -215,11 +216,15 @@ export default class WhiskyAndGinBoard extends React.Component {
       let notePartial
       if(note.imgSrc)
         notePartial = <div className={ "Note Note--image " + groupedClasses } style={ style }>
-          <img src={ note.imgSrc } />
+          <div className="Note__body">
+            <img src={ note.imgSrc } />
+          </div>
         </div>
        else
         notePartial = <div className={ "Note Note--text " + groupedClasses }  style={ style }>
-          <h5>{ note.text }</h5>
+          <div className="Note__body">
+            <h5>{ note.text }</h5>
+          </div>
         </div>
 
           return <Hammer
