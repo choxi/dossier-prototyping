@@ -1,5 +1,5 @@
 import React from "react"
-import WhiskyAndGinBoard from "./WhiskyAndGinBoard"
+import WhiskyAndGinBoard2 from "./WhiskyAndGinBoard2"
 import "./styles.scss"
 
 export default class WhiskyAndGin extends React.Component {
@@ -18,7 +18,7 @@ export default class WhiskyAndGin extends React.Component {
 
   render() {
     return <div className="Grouping">
-      <WhiskyAndGinBoard showTools={ this.props.showTools } />
+      <WhiskyAndGinBoard2 showTools={ this.props.showTools } />
     </div>
   }
 }
