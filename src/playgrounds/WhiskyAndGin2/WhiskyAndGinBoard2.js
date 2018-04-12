@@ -9,7 +9,7 @@ export default class WhiskyAndGinBoard extends React.Component {
   constructor() {
     super()
 
-    this.state = Object.assign({}, SampleData.cocktails, { proximityPadding: 10 })
+    this.state = Object.assign({}, SampleData.cocktails, { proximityPadding: 10 } })
     this.noteRefs = {}
     this.boardRef = React.createRef()
     this.state.notes.forEach(note => {

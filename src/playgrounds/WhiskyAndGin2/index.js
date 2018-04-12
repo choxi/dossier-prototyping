@@ -17,7 +17,7 @@ export default class WhiskyAndGin extends React.Component {
   }
 
   render() {
-    return <div className="Grouping">
+    return <div className="Grouping Grouping--proximity">
       <WhiskyAndGinBoard2 showTools={ this.props.showTools } />
     </div>
   }
