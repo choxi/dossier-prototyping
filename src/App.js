@@ -9,6 +9,7 @@ import Grouping2 from "./playgrounds/Grouping2"
 import Grouping3 from "./playgrounds/Grouping3"
 import Grouping4 from "./playgrounds/Grouping4"
 import Grouping5 from "./playgrounds/Grouping5"
+import WhiskyAndGin from "./playgrounds/WhiskyAndGin"
 
 import "./App.scss"
 import 'font-awesome/css/font-awesome.min.css'
@@ -31,6 +32,7 @@ export default class App extends React.Component {
           <li><Link to="/grouping3">Remember Groups</Link></li>
           <li><Link to="/grouping4">Remember Groups (DTap)</Link></li>
           <li><Link to="/grouping5">Remember Groups (Long Press)</Link></li>
+          <li><Link to="/whiskyandgin">Whisky and Gin</Link></li>
         </ul>
       </div>
 
@@ -46,6 +48,7 @@ export default class App extends React.Component {
           <Route path="/grouping3" component={ Grouping3 } />
           <Route path="/grouping4" component={ Grouping4 } />
           <Route path="/grouping5" component={ Grouping5 } />
+          <Route path="/whiskyandgin" component={ WhiskyAndGin } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">
