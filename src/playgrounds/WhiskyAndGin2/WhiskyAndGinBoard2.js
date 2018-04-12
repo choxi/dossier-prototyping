@@ -172,25 +172,9 @@ export default class WhiskyAndGinBoard extends React.Component {
     return newNotes
   }
 
-  handleTap(note, event) {
-    if(this.state.activeGroup && note.groupId !== this.state.activeGroup) {
-      let index = this.state.notes.findIndex(n => n.id === note.id)
-      let newNote = Object.assign({}, note, { groupId: this.state.activeGroup })
-      let newNotes = this.state.notes.set(index, newNote)
-      this.setState({ notes: newNotes, activeGroup: newNote.groupId })
-    } else if(this.state.activeGroup && note.groupId === this.state.activeGroup) {
-      let index = this.state.notes.findIndex(n => n.id === note.id)
-      let newNote = Object.assign({}, note, { groupId: null })
-      let newNotes = this.state.notes.set(index, newNote)
-      this.setState({ notes: newNotes })
-    } else if(note.groupId) {
-      this.setState({ activeGroup: note.groupId })
-    } else {
-      let index = this.state.notes.findIndex(n => n.id === note.id)
-      let newNote = Object.assign({}, note, { groupId: uuid() })
-      let newNotes = this.state.notes.set(index, newNote)
-      this.setState({ notes: newNotes, activeGroup: newNote.groupId })
-    }
+  handlePress(note, event) {
+    let newNotes = this.updateNote(this.state.notes, note, { groupId: null })
+    this.setState({ notes: newNotes, activeNote: note })
   }
 
   cancelGroup(event) {
@@ -200,12 +184,11 @@ export default class WhiskyAndGinBoard extends React.Component {
   }
 
   render() {
-    let doubleTapOptions = {
+    let pressOptions = {
       recognizers: {
-        tap: {
-          taps: 2,
+        press: {
           threshold: 10,
-          posThreshold: 20
+          time: 300
         }
       }
     }
@@ -242,10 +225,10 @@ export default class WhiskyAndGinBoard extends React.Component {
           return <Hammer
             ref={ this.noteRefs[note.id] }
             key={ note.id }
-            options={ doubleTapOptions }
+            options={ pressOptions }
             onPan={ event => this.handlePan(note, event) }
             onPanEnd={ event => this.handlePanEnd(note, event) }
-            onTap={ event => this.handleTap(note, event) }
+            onPress={ event => this.handlePress(note, event) }
           >
         { notePartial }
       </Hammer>
@@ -261,11 +244,9 @@ export default class WhiskyAndGinBoard extends React.Component {
 
     return <div>
       { tools }
-      <Hammer options={ doubleTapOptions } onTap={ event => this.cancelGroup(event) }>
-        <div className="Board" ref={ this.boardRef }>
-          { notes }
-        </div>
-      </Hammer>
+      <div className="Board" ref={ this.boardRef }>
+        { notes }
+      </div>
     </div>
   }
 }
