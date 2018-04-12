@@ -18,7 +18,7 @@ import 'font-awesome/css/font-awesome.min.css'
 export default class App extends React.Component {
   constructor() {
     super()
-    this.state = { showTools: true }
+    this.state = { showTools: false }
   }
 
   render() {
