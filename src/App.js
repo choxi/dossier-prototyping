@@ -47,9 +47,18 @@ export default class App extends React.Component {
             <li><Link activeClassName="App__navigation__link--active" to="/grouping5">Remember Groups (Long Press)</Link></li>
           </div>
 
-          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin">Whisky and Gin - A</NavLink></li>
-          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-proximity">Whisky and Gin - B</NavLink></li>
-          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-press">Whisky and Gin - C</NavLink></li>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin">
+            <p>(A) explicit control</p>
+            <p className="App__navigation__caption">double-tap to add/remove from cluster</p>
+          </NavLink></li>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-proximity">
+            <p>(B) proximity-based</p>
+            <p className="App__navigation__caption">long press to detach an item</p>
+          </NavLink></li>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-press">
+            <p>(C) cluster coloring</p>
+            <p className="App__navigation__caption">double-tap to add/remove from cluster</p>
+          </NavLink></li>
 
           <h3>Sample Data</h3>
           <li>

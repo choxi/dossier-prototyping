@@ -9,6 +9,7 @@ html, body {
 
 a {
   cursor: pointer;
+  text-decoration: none;
 }
 
 .App {
@@ -31,11 +32,21 @@ a {
     a {
       color: #333;
       display: inline-block;
-      width: 100%;
+      width: 200px;
       margin-right: 5px;
       box-sizing: border-box;
+      padding: 0.5em;
     }
   }
+
+  p {
+    margin: 0;
+  }
+}
+
+p.App__navigation__caption {
+  font-size: 12px;
+  margin-top: 10px;
 }
 
 .App__navigation__link {
