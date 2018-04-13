@@ -21,7 +21,7 @@ export default class App extends React.Component {
     super()
 
     this.state = { 
-      sampleData: "chicago",
+      sampleData: "cocktails",
       showTools: false 
     }
   }
