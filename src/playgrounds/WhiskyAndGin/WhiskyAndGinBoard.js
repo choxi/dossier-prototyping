@@ -9,7 +9,7 @@ export default class WhiskyAndGinBoard extends React.Component {
   constructor() {
     super()
 
-    this.state = SampleData.cocktails
+    this.state = SampleData.chicago
 
     this.noteRefs = {}
     this.boardRef = React.createRef()
