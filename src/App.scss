@@ -7,6 +7,10 @@ html, body {
   font-family: Helvetica Neue, Helvetica, arial, sans-serif;
 }
 
+a {
+  cursor: pointer;
+}
+
 .App {
   display: flex;
 }
@@ -23,11 +27,25 @@ html, body {
     li {
       margin-bottom: 0.5em;
     }
-    
+
     a {
       color: #333;
+      display: inline-block;
+      width: 100%;
+      margin-right: 5px;
+      box-sizing: border-box;
     }
   }
+}
+
+.App__navigation__link {
+  padding: 0.5em;
+}
+
+.App__navigation__link--active {
+  padding: 0.35em 0.5em;
+  background: #7fd226;
+  border-radius: 0.25em;
 }
 
 .App__body {

@@ -1,5 +1,5 @@
 import React from "react"
-import { BrowserRouter, Route, Link } from "react-router-dom"
+import { BrowserRouter, Route, Link, NavLink } from "react-router-dom"
 import Hammer from "react-hammerjs"
 
 import Zoom from "./playgrounds/Zoom"
@@ -19,36 +19,58 @@ import 'font-awesome/css/font-awesome.min.css'
 export default class App extends React.Component {
   constructor() {
     super()
-    this.state = { showTools: false }
+
+    this.state = { 
+      sampleData: "chicago",
+      showTools: false 
+    }
+  }
+
+  linkClass(path) {
   }
 
   render() {
     let navigation
+    let sampleData = this.state.sampleData
+    let linkClass = "App__navigation__link"
+
     if(this.state.showTools)
       navigation = <div className="App__navigation">
         <ul>
           <div style={{ display: "none" }}>
-            <li><Link to="/momentum">Momentum</Link></li>
-            <li><Link to="/zoom">Zoom</Link></li>
-            <li><Link to="/grouping">Group with DTap</Link></li>
-            <li><Link to="/grouping2">Group with MultiSelect</Link></li>
-            <li><Link to="/grouping3">Remember Groups</Link></li>
-            <li><Link to="/grouping4">Remember Groups (DTap)</Link></li>
-            <li><Link to="/grouping5">Remember Groups (Long Press)</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/momentum">Momentum</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/zoom">Zoom</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/grouping">Group with DTap</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/grouping2">Group with MultiSelect</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/grouping3">Remember Groups</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/grouping4">Remember Groups (DTap)</Link></li>
+            <li><Link activeClassName="App__navigation__link--active" to="/grouping5">Remember Groups (Long Press)</Link></li>
           </div>
 
-          <li><Link to="/whiskyandgin">Whisky and Gin - A</Link></li>
-          <li><Link to="/whiskyandgin-proximity">Whisky and Gin - B</Link></li>
-          <li><Link to="/whiskyandgin-press">Whisky and Gin - C</Link></li>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin">Whisky and Gin - A</NavLink></li>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-proximity">Whisky and Gin - B</NavLink></li>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-press">Whisky and Gin - C</NavLink></li>
+
+          <h3>Sample Data</h3>
+          <li>
+            <a className={ sampleData === "cocktails" ? "App__navigation__link--active" : linkClass } onClick={ () => this.setState({ sampleData: "cocktails" }) }>Cocktails</a>
+          </li>
+          <li>
+            <a className={ sampleData === "chicago" ? "App__navigation__link--active" : linkClass } onClick={ () => this.setState({ sampleData: "chicago" }) }>Chicago Team Summit</a>
+          </li>
         </ul>
       </div>
 
+   let globalOptions = {
+     showTools: this.state.showTools,
+     sampleData: this.state.sampleData
+   }
 
     return <BrowserRouter>
       <div className="App">
         { navigation }
         <div className="App__body">
-          <Route path="/momentum" render={ () => <Momentum showTools={ this.state.showTools } /> } />
+          <Route path="/momentum" render={ () => <Momentum { ...globalOptions }/> } />
           <Route path="/zoom" component={ Zoom } />
           <Route path="/grouping" component={ Grouping } />
           <Route path="/grouping2" component={ Grouping2 } />
@@ -56,8 +78,8 @@ export default class App extends React.Component {
           <Route path="/grouping4" component={ Grouping4 } />
           <Route path="/grouping5" component={ Grouping5 } />
           <Route path="/whiskyandgin" component={ WhiskyAndGin } />
-          <Route path="/whiskyandgin-proximity" render={ () => <WhiskyAndGin2 showTools={ this.state.showTools }/> } />
-          <Route path="/whiskyandgin-press" render={ () => <WhiskyAndGin3 showTools={ this.state.showTools }/> } />
+          <Route path="/whiskyandgin-proximity" render={ () => <WhiskyAndGin2 { ...globalOptions } /> } />
+          <Route path="/whiskyandgin-press" render={ () => <WhiskyAndGin3 { ...globalOptions } /> } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">

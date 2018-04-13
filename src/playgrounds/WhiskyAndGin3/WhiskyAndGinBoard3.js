@@ -7,17 +7,30 @@ import SampleData from "../../sample-data"
 import { updateNote, idToHex } from "../../lib/helpers"
 
 export default class WhiskyAndGinBoard3 extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
-    this.state = SampleData.cocktails
+    this.state = SampleData[this.props.sampleData]
     this.state.notes.forEach(n => n.anchor = false)
 
-    this.noteRefs = {}
     this.boardRef = React.createRef()
+    this.noteRefs = {}
     this.state.notes.forEach(note => {
       this.noteRefs[note.id] = React.createRef()
     })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.sampleData !== this.props.sampleData) {
+      let newState = SampleData[nextProps.sampleData]
+      newState.notes.forEach(n => n.anchor = false)
+      this.setState(newState)
+
+      this.noteRefs = {}
+      newState.notes.forEach(note => {
+        this.noteRefs[note.id] = React.createRef()
+      })
+    }
   }
 
   handlePress(note, event) {
