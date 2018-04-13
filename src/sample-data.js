@@ -35,16 +35,25 @@ export default class SampleData {
       { groupId: null, id: 1, x: 500, y: 10, deltaX: 0, deltaY: 0, text: "Chicago Summit" },
       { groupId: null, id: 2, x: 650, y: 360, deltaX: 0, deltaY: 0, text: "Culture/fun activities" },
       { groupId: null, id: 3, x: 200, y: 50, deltaX: 0, deltaY: 0, text: "Logistics" },
+      { groupId: null, id: 4, x: 750, y: 70, deltaX: 0, deltaY: 0, text: "Discussion topics" },
       // airbnb
-      { groupId: null, id: 4, x: 10, y: 90, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/spX2U3H.png" },
+      { groupId: null, id: 10, x: 10, y: 90, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/spX2U3H.png" },
       // address
-      { groupId: null, id: 5, x: 270, y: 260, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/1Wc0aBY.png" },
+      { groupId: null, id: 11, x: 270, y: 260, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/1Wc0aBY.png" },
       // arrivals
-      { groupId: null, id: 6, x: 270, y: 90, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/IOQNXKi.png" },
+      { groupId: null, id: 12, x: 270, y: 90, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/IOQNXKi.png" },
       // list of activities
-      { groupId: null, id: 7, x: 740, y: 410, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/cuTetd1.png" },
+      { groupId: null, id: 13, x: 740, y: 410, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/cuTetd1.png" },
       // rookery building
-      { groupId: null, id: 8, x: 480, y: 420, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/PNLYCzf.png" }
+      { groupId: null, id: 14, x: 480, y: 420, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/PNLYCzf.png" },
+      // vision
+      { groupId: null, id: 15, x: 700, y: 120, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/7n8PYqM.png" },
+      // principles
+      { groupId: null, id: 16, x: 670, y: 150, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/KBPF5DT.png" },
+      // beachhead
+      { groupId: null, id: 17, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/s8VBi5O.png" },
+      // roadmap
+      { groupId: null, id: 18, x: 650, y: 180, deltaX: 0, deltaY: 0, imgSrc: "https://imgur.com/ZiXgNlt.png" }
     ])
   }
 }
