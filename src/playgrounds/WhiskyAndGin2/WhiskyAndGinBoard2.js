@@ -18,6 +18,30 @@ export default class WhiskyAndGinBoard extends React.Component {
     })
   }
 
+  componentWillMount() {
+    let newState = SampleData[this.props.sampleData]
+    newState.notes.forEach(n => n.anchor = false)
+    this.setState(newState)
+
+    this.noteRefs = {}
+    newState.notes.forEach(note => {
+      this.noteRefs[note.id] = React.createRef()
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.sampleData !== this.props.sampleData) {
+      let newState = SampleData[nextProps.sampleData]
+      newState.notes.forEach(n => n.anchor = false)
+      this.setState(newState)
+
+      this.noteRefs = {}
+      newState.notes.forEach(note => {
+        this.noteRefs[note.id] = React.createRef()
+      })
+    }
+  }
+
   handlePan(note, event) {
     event.preventDefault()
     event.srcEvent.preventDefault()

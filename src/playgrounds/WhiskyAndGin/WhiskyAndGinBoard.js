@@ -6,16 +6,40 @@ import uuid from "uuid/v4"
 import SampleData from "../../sample-data"
 
 export default class WhiskyAndGinBoard extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
-    this.state = SampleData.chicago
+    this.state = SampleData[this.props.sampleData]
 
     this.noteRefs = {}
     this.boardRef = React.createRef()
     this.state.notes.forEach(note => {
       this.noteRefs[note.id] = React.createRef()
     })
+  }
+
+  componentWillMount() {
+    let newState = SampleData[this.props.sampleData]
+    newState.notes.forEach(n => n.anchor = false)
+    this.setState(newState)
+
+    this.noteRefs = {}
+    newState.notes.forEach(note => {
+      this.noteRefs[note.id] = React.createRef()
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.sampleData !== this.props.sampleData) {
+      let newState = SampleData[nextProps.sampleData]
+      newState.notes.forEach(n => n.anchor = false)
+      this.setState(newState)
+
+      this.noteRefs = {}
+      newState.notes.forEach(note => {
+        this.noteRefs[note.id] = React.createRef()
+      })
+    }
   }
 
   handlePan(note, event) {

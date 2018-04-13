@@ -77,7 +77,7 @@ export default class App extends React.Component {
           <Route path="/grouping3" component={ Grouping3 } />
           <Route path="/grouping4" component={ Grouping4 } />
           <Route path="/grouping5" component={ Grouping5 } />
-          <Route path="/whiskyandgin" component={ WhiskyAndGin } />
+          <Route path="/whiskyandgin" render={ () => <WhiskyAndGin { ...globalOptions } /> } />
           <Route path="/whiskyandgin-proximity" render={ () => <WhiskyAndGin2 { ...globalOptions } /> } />
           <Route path="/whiskyandgin-press" render={ () => <WhiskyAndGin3 { ...globalOptions } /> } />
 
