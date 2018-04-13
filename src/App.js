@@ -47,6 +47,8 @@ export default class App extends React.Component {
             <li><Link activeClassName="App__navigation__link--active" to="/grouping5">Remember Groups (Long Press)</Link></li>
           </div>
 
+          <h3>Clusters</h3>
+
           <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin">
             <p>(A) explicit control</p>
             <p className="App__navigation__caption">double-tap to add/remove from cluster</p>
