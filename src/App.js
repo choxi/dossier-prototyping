@@ -12,6 +12,7 @@ import Grouping5 from "./playgrounds/Grouping5"
 import WhiskyAndGin from "./playgrounds/WhiskyAndGin"
 import WhiskyAndGin2 from "./playgrounds/WhiskyAndGin2"
 import WhiskyAndGin3 from "./playgrounds/WhiskyAndGin3"
+import DungeonNav from "./playgrounds/DungeonNav"
 
 import "./App.scss"
 import 'font-awesome/css/font-awesome.min.css'
@@ -48,7 +49,6 @@ export default class App extends React.Component {
           </div>
 
           <h3>Clusters</h3>
-
           <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin">
             <p>(A) explicit control</p>
             <p className="App__navigation__caption">double-tap to add/remove from cluster</p>
@@ -60,6 +60,11 @@ export default class App extends React.Component {
           <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/whiskyandgin-press">
             <p>(C) cluster coloring</p>
             <p className="App__navigation__caption">double-tap to add/remove from cluster</p>
+          </NavLink></li>
+
+          <h3>Navigation</h3>
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/dungeonnav">
+            <p>dungeon map</p>
           </NavLink></li>
 
           <h3>Sample Data</h3>
@@ -91,6 +96,7 @@ export default class App extends React.Component {
           <Route path="/whiskyandgin" render={ () => <WhiskyAndGin { ...globalOptions } /> } />
           <Route path="/whiskyandgin-proximity" render={ () => <WhiskyAndGin2 { ...globalOptions } /> } />
           <Route path="/whiskyandgin-press" render={ () => <WhiskyAndGin3 { ...globalOptions } /> } />
+          <Route path="/dungeonnav" render={ () => <DungeonNav { ...globalOptions } /> } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">
