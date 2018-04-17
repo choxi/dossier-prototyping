@@ -1,8 +1,13 @@
 import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
+import Swipeable from 'react-swipeable'
 
 export default class Board extends React.Component {
+  static defaultProps = {
+    onSwipe: () => {}
+  }
+
   constructor(props) {
     super(props)
     this.boardRef = React.createRef()
@@ -60,6 +65,12 @@ export default class Board extends React.Component {
     this.setState({ notes: newNotes })
   }
 
+  handleSwipe(event, direction) {
+    let newEvent = Object.assign({}, event, { direction: direction })
+    if(event.target.className === "Board")
+      this.props.onSwipe(newEvent)
+  }
+
   render() {
     let notes = this.state.notes.map(note => {
       let style = { 
@@ -82,8 +93,16 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
-    return <div className="Board" ref={ this.boardRef }>
-      { notes }
-    </div>
+    return <Swipeable 
+      preventDefaultTouchmoveEvent={ true } 
+      onSwipedUp={ event => this.handleSwipe(event, "up") }
+      onSwipedDown={ event => this.handleSwipe(event, "down") }
+      onSwipedLeft={ event => this.handleSwipe(event, "left") }
+      onSwipedRight={ event => this.handleSwipe(event, "right") }
+    >
+      <div className="Board" ref={ this.boardRef }>
+        { notes }
+      </div>
+    </Swipeable>
   }
 }

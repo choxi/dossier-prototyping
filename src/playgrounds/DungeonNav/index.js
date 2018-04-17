@@ -117,7 +117,24 @@ export default class DungeonNav extends React.Component {
   }
 
   moveToBoard(index) {
-    this.setState({ currentBoardIndex: index }) 
+    let board = this.state.grid.get(index[0]).get(index[1])
+
+    if(board)
+      this.setState({ currentBoardIndex: index }) 
+  }
+
+  handleSwipe(event) {
+    let row = this.state.currentBoardIndex[0]
+    let column = this.state.currentBoardIndex[1]
+
+    if(event.direction === "up")
+      this.moveToBoard([ row + 1, column ])
+    else if(event.direction === "down")
+      this.moveToBoard([ row - 1, column ])
+    else if(event.direction === "left")
+      this.moveToBoard([ row, column + 1 ])
+    else if(event.direction === "right")
+      this.moveToBoard([ row, column - 1 ])
   }
 
   renderBoards({ grid, currentBoardIndex }) {
@@ -131,9 +148,10 @@ export default class DungeonNav extends React.Component {
         let top = height * rowIndex +  "px"
         let left = width * colIndex + "px"
         let style = { width: width + "px", height: height + "px", top: top, left: left }
+        style.opacity = board ? 1.0 : 0.0
 
         return <div className="DungeonNav__gridCell" style={ style }>
-          <DungeonNavBoard key={ [ rowIndex, colIndex ] } notes={ notes } /> 
+          <DungeonNavBoard onSwipe={ event => this.handleSwipe(event) } key={ [ rowIndex, colIndex ] } notes={ notes } /> 
         </div>
       })
     })
