@@ -6,7 +6,8 @@ import Swipeable from 'react-swipeable'
 export default class Board extends React.Component {
   static defaultProps = {
     onSwipe: () => {},
-    onPinchIn: () => {}
+    onPinchIn: () => {},
+    onNoteUpdate: () => {}
   }
 
   constructor(props) {
@@ -31,7 +32,7 @@ export default class Board extends React.Component {
     let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
     let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes })
+    this.props.onNoteUpdate({ notes: newNotes })
   }
 
   noteInBounds(note) {
@@ -57,13 +58,9 @@ export default class Board extends React.Component {
     let newY = note.y + note.deltaY
 
     let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
-
-    if(!this.noteInBounds(newNote))
-      return
-
     let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes })
+    this.props.onNoteUpdate({ notes: newNotes })
   }
 
   handleSwipe(event, direction) {

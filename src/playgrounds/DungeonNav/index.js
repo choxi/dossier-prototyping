@@ -155,6 +155,15 @@ export default class DungeonNav extends React.Component {
     }
   }
 
+  handleNoteUpdate(index, notes) {
+    let board = this.state.grid.get(index[0]).get(index[1])
+    let newBoard = board.set("notes", notes)
+    let newRow = this.state.grid.get(index[0]).set(index[1], newBoard)
+    let newGrid = this.state.grid.set(index[0], newRow)
+
+    this.setState({ grid: newGrid })
+  }
+
   renderBoards({ grid, currentBoardIndex }) {
     let { width, height } = this.state.viewportDimensions
     width = width - 2*VIEWPORT_PADDING
@@ -167,14 +176,16 @@ export default class DungeonNav extends React.Component {
         let left = width * colIndex + "px"
         let style = { width: width + "px", height: height + "px", top: top, left: left }
         style.opacity = board ? 1.0 : 0.0
+        let index = [ rowIndex, colIndex ]
 
-        return <Hammer onTap={ event => this.handleCellTap(event, [ rowIndex, colIndex]) }>
+        return <Hammer onTap={ event => this.handleCellTap(event, index) }>
           <div className="DungeonNav__gridCell" style={ style }>
             <DungeonNavBoard 
               notes={ notes } 
               onPinchIn={ event => this.handlePinchIn(event) } 
               onSwipe={ event => this.handleSwipe(event) } 
-              key={ [ rowIndex, colIndex ] } 
+              onNoteUpdate={ ({ notes }) => this.handleNoteUpdate(index, notes) }
+              key={ index } 
             /> 
           </div>
         </Hammer>
