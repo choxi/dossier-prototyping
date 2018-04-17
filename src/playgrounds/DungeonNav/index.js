@@ -39,7 +39,22 @@ export default class DungeonNav extends React.Component {
       [ null, null, null,         null, null ],
     ]
 
-    this.state = { grid: Immutable.fromJS(grid), currentBoardIndex: [2, 2] }
+    this.state = { grid: Immutable.fromJS(grid), currentBoardIndex: [2, 2], viewportDimensions: { width: 0, height: 0 } }
+    this.viewport = React.createRef()
+    this.updateViewportDimensions = this.updateViewportDimensions.bind(this)
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.updateViewportDimensions)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateViewportDimensions)
+  }
+
+  updateViewportDimensions() {
+    let { clientWidth, clientHeight } = this.viewport.current
+    this.setState({ viewportDimensions: { width: clientWidth, height: clientHeight }})
   }
 
   getAdjacentBoards(grid, index) {
@@ -103,6 +118,30 @@ export default class DungeonNav extends React.Component {
     this.setState({ currentBoardIndex: index }) 
   }
 
+  renderBoards({ grid, currentBoardIndex }) {
+    let { width, height } = this.state.viewportDimensions
+
+    let boards = grid.map((row, rowIndex) => {
+      return row.map((board, colIndex) => {
+        let notes = board ? board.get("notes") : List([])
+        let top = height * rowIndex +  "px"
+        let left = width * colIndex + "px"
+        let style = { width: width + "px", height: height + "px", top: top, left: left }
+
+        return <div className="DungeonNav__gridCell" style={ style }>
+          <DungeonNavBoard key={ [ rowIndex, colIndex ] } notes={ notes } /> 
+        </div>
+      })
+    })
+
+    let style = {
+      top: -(currentBoardIndex[0] * height),
+      left: -(currentBoardIndex[1] * width)
+    }
+
+    return <div className="DungeonNav__boards" style={ style }>{ boards }</div>
+  }
+
   render() {
     let index = this.state.currentBoardIndex
     let currentBoard = this.state.grid.get(index[0]).get(index[1])
@@ -119,17 +158,13 @@ export default class DungeonNav extends React.Component {
         </Hammer>
       else if(board === undefined)
         partial = <div key={ key } className={ classNames }>Edge</div>
-      else if(board.get && board.get("id"))
-        partial = <Hammer key={ key } onTap={ () => this.moveToBoard(indices[key]) }>
-          <DungeonNavBoard notes={ board.get("notes") } />
-        </Hammer>
 
       adjacentPartials.push(partial)
     })
 
     return <div className="DungeonNav">
       { adjacentPartials }
-      <DungeonNavBoard notes={ currentBoard.get("notes") } showTools={ this.props.showTools } />
+      <div className="DungeonNav__viewport" ref={ this.viewport }> { this.renderBoards(this.state) } </div>
     </div>
   }
 }
