@@ -5,7 +5,8 @@ import Swipeable from 'react-swipeable'
 
 export default class Board extends React.Component {
   static defaultProps = {
-    onSwipe: () => {}
+    onSwipe: () => {},
+    onPinchIn: () => {}
   }
 
   constructor(props) {
@@ -71,6 +72,11 @@ export default class Board extends React.Component {
       this.props.onSwipe(newEvent)
   }
 
+  handlePinchEnd(event) {
+    if(event.scale < 1.0)
+      this.props.onPinchIn(event)
+  }
+
   render() {
     let notes = this.state.notes.map(note => {
       let style = { 
@@ -93,6 +99,12 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
+    let pinchOptions = {
+      recognizers: {
+        pinch: { enable: true }
+      }
+    }
+
     return <Swipeable 
       preventDefaultTouchmoveEvent={ true } 
       onSwipedUp={ event => this.handleSwipe(event, "up") }
@@ -100,9 +112,11 @@ export default class Board extends React.Component {
       onSwipedLeft={ event => this.handleSwipe(event, "left") }
       onSwipedRight={ event => this.handleSwipe(event, "right") }
     >
-      <div className="Board" ref={ this.boardRef }>
-        { notes }
-      </div>
+      <Hammer options={ pinchOptions } onPinchEnd={ event => this.handlePinchEnd(event) }>
+        <div className="Board" ref={ this.boardRef }>
+          { notes }
+        </div>
+      </Hammer>
     </Swipeable>
   }
 }

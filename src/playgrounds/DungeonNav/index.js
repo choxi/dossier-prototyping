@@ -9,6 +9,7 @@ import "./styles.scss"
 const MAX_ROWS = 5
 const MAX_COLS = 5
 const VIEWPORT_PADDING = 100
+const ZOOM_OUT_SCALE = 0.25
 
 export default class DungeonNav extends React.Component {
   constructor() {
@@ -40,7 +41,13 @@ export default class DungeonNav extends React.Component {
       [ null, null, null,         null, null ],
     ]
 
-    this.state = { grid: Immutable.fromJS(grid), currentBoardIndex: [2, 2], viewportDimensions: { width: 0, height: 0 } }
+    this.state = { 
+      grid: Immutable.fromJS(grid), 
+      currentBoardIndex: [2, 2], 
+      viewportDimensions: { width: 0, height: 0 },
+      zoomOut: false
+    }
+
     this.viewport = React.createRef()
     this.updateViewportDimensions = this.updateViewportDimensions.bind(this)
   }
@@ -137,6 +144,17 @@ export default class DungeonNav extends React.Component {
       this.moveToBoard([ row, column - 1 ])
   }
 
+  handlePinchIn(event) {
+    this.setState({ zoomOut: true })
+  }
+
+  handleCellTap(event, index) {
+    let board = this.state.grid.get(index[0]).get(index[1])
+    if(this.state.zoomOut && board) {
+      this.setState({ zoomOut: false, currentBoardIndex: index })
+    }
+  }
+
   renderBoards({ grid, currentBoardIndex }) {
     let { width, height } = this.state.viewportDimensions
     width = width - 2*VIEWPORT_PADDING
@@ -150,16 +168,32 @@ export default class DungeonNav extends React.Component {
         let style = { width: width + "px", height: height + "px", top: top, left: left }
         style.opacity = board ? 1.0 : 0.0
 
-        return <div className="DungeonNav__gridCell" style={ style }>
-          <DungeonNavBoard onSwipe={ event => this.handleSwipe(event) } key={ [ rowIndex, colIndex ] } notes={ notes } /> 
-        </div>
+        return <Hammer onTap={ event => this.handleCellTap(event, [ rowIndex, colIndex]) }>
+          <div className="DungeonNav__gridCell" style={ style }>
+            <DungeonNavBoard 
+              notes={ notes } 
+              onPinchIn={ event => this.handlePinchIn(event) } 
+              onSwipe={ event => this.handleSwipe(event) } 
+              key={ [ rowIndex, colIndex ] } 
+            /> 
+          </div>
+        </Hammer>
       })
     })
 
-    let style = {
-      top: -(currentBoardIndex[0] * height - VIEWPORT_PADDING),
-      left: -(currentBoardIndex[1] * width - VIEWPORT_PADDING)
-    }
+    let style 
+    if(this.state.zoomOut)
+      style = {
+        top: -(currentBoardIndex[0] * height - VIEWPORT_PADDING) * ZOOM_OUT_SCALE,
+        left: -(currentBoardIndex[1] * width - VIEWPORT_PADDING) * ZOOM_OUT_SCALE,
+        zoom: ZOOM_OUT_SCALE,
+        transition: "none"
+      }
+    else
+      style = {
+        top: -(currentBoardIndex[0] * height - VIEWPORT_PADDING),
+        left: -(currentBoardIndex[1] * width - VIEWPORT_PADDING)
+      }
 
     return <div className="DungeonNav__boards" style={ style }>{ boards }</div>
   }
