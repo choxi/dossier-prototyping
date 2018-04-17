@@ -46,6 +46,7 @@ export default class DungeonNav extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.updateViewportDimensions)
+    setTimeout(this.updateViewportDimensions, 100)
   }
 
   componentWillUnmount() {
@@ -158,6 +159,10 @@ export default class DungeonNav extends React.Component {
         </Hammer>
       else if(board === undefined)
         partial = <div key={ key } className={ classNames }>Edge</div>
+      else if(board.get && board.get("id"))
+        partial = <Hammer key={ key } onTap={ () => this.moveToBoard(indices[key]) }>
+          <div className={ classNames + " DungeonNav__addBoard--moveToBoard" }>{ " " }</div>
+        </Hammer>
 
       adjacentPartials.push(partial)
     })

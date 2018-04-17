@@ -63,6 +63,11 @@
   text-align: center;
 }
 
+.DungeonNav__addBoard--moveToBoard {
+  border: 1px solid #CCC;
+  background: transparent;
+}
+
 .DungeonNav__addBoard--top {
   grid-column-start: 2;
   grid-column-end: 3;
