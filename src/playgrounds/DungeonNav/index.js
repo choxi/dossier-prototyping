@@ -8,6 +8,7 @@ import "./styles.scss"
 
 const MAX_ROWS = 5
 const MAX_COLS = 5
+const VIEWPORT_PADDING = 100
 
 export default class DungeonNav extends React.Component {
   constructor() {
@@ -121,6 +122,8 @@ export default class DungeonNav extends React.Component {
 
   renderBoards({ grid, currentBoardIndex }) {
     let { width, height } = this.state.viewportDimensions
+    width = width - 2*VIEWPORT_PADDING
+    height = height - 2*VIEWPORT_PADDING
 
     let boards = grid.map((row, rowIndex) => {
       return row.map((board, colIndex) => {
@@ -136,8 +139,8 @@ export default class DungeonNav extends React.Component {
     })
 
     let style = {
-      top: -(currentBoardIndex[0] * height),
-      left: -(currentBoardIndex[1] * width)
+      top: -(currentBoardIndex[0] * height - VIEWPORT_PADDING),
+      left: -(currentBoardIndex[1] * width - VIEWPORT_PADDING)
     }
 
     return <div className="DungeonNav__boards" style={ style }>{ boards }</div>
@@ -168,8 +171,10 @@ export default class DungeonNav extends React.Component {
     })
 
     return <div className="DungeonNav">
-      { adjacentPartials }
-      <div className="DungeonNav__viewport" ref={ this.viewport }> { this.renderBoards(this.state) } </div>
+      <div className="DungeonNav__viewport" ref={ this.viewport }> 
+        { adjacentPartials }
+        { this.renderBoards(this.state) } 
+      </div>
     </div>
   }
 }
