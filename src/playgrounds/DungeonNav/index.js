@@ -121,7 +121,7 @@ export default class DungeonNav extends React.Component {
         partial = <div key={ key } className={ classNames }>Edge</div>
       else if(board.get && board.get("id"))
         partial = <Hammer key={ key } onTap={ () => this.moveToBoard(indices[key]) }>
-          <div className={ classNames }>{ board.get("id") }</div>
+          <DungeonNavBoard notes={ board.get("notes") } />
         </Hammer>
 
       adjacentPartials.push(partial)

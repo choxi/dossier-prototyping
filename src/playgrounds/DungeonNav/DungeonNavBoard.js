@@ -9,17 +9,13 @@ export default class Board extends React.Component {
     this.state = { notes: this.props.notes }
 
     this.noteRefs = {}
-    this.state.notes.forEach(note => {
-      this.noteRefs[note.id] = React.createRef()
-    })
+    this.state.notes.forEach(note => this.noteRefs[note.id] = React.createRef())
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({ notes: nextProps.notes }, () => {
       this.noteRefs = {}
-      this.state.notes.forEach(note => {
-        this.noteRefs[note.id] = React.createRef()
-      })
+      this.state.notes.forEach(note => this.noteRefs[note.id] = React.createRef())
     })
   }
 
