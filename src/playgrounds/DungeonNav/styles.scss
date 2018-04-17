@@ -1,6 +1,11 @@
 .DungeonNav { 
   height: 100%;
 
+  .fa-plus-circle {
+    color: #AAA;
+    font-size: 20px;
+  }
+
   .Note {
     position: absolute;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
@@ -53,11 +58,13 @@
 }
 
 .DungeonNav__addBoard {
-  background: #AAA;
+  background: #CCC;
   padding: 1em;
   text-align: center;
   position: absolute;
   z-index: 1;
+  display: flex;
+  align-items: center;
 }
 
 .DungeonNav__addBoard--moveToBoard {
@@ -67,12 +74,14 @@
 
 .DungeonNav__addBoard--top {
   top: 0;
-  width: 100%
+  width: 100%;
+  flex-direction: column;
 }
 
 .DungeonNav__addBoard--bottom {
   bottom: 0;
   width: 100%;
+  flex-direction: column;
 }
 
 .DungeonNav__addBoard--left {

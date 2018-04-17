@@ -158,7 +158,7 @@ export default class DungeonNav extends React.Component {
 
       if(board === null)
         partial = <Hammer key={ key } onTap={ () => this.addBoard(index, key) }>
-          <div className={ classNames }>+</div>
+          <div className={ classNames }><span style={{ verticalAlign: "middle" }}><i className="fa fa-plus-circle"></i></span></div>
         </Hammer>
       else if(board === undefined)
         partial = <div key={ key } className={ classNames }>Edge</div>
