@@ -1,0 +1,36 @@
+<html>
+  <body>
+    <style>
+      .window {
+        width: 200px;
+        height: 200px;
+        border: 1px solid black;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .grid {
+        width: 1000px;
+        height: 1000px;
+        background-image: url("https://images.pexels.com/photos/33044/sunflower-sun-summer-yellow.jpg?auto=compress&cs=tinysrgb&h=350");
+        position: absolute;
+        top: 0;
+        transition: top 1s linear;
+      }
+    </style>
+
+    <div class="window">
+      <div class="grid">
+      </div>
+    </div>
+
+    <script>
+      var viewport = document.getElementsByClassName("window")[0]
+      var grid = document.getElementsByClassName("grid")[0]
+
+      viewport.addEventListener("click", () => {
+        grid.style.top = "-20px"
+      })
+    </script>
+  </body>
+</html>
