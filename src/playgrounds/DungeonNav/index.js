@@ -176,6 +176,7 @@ export default class DungeonNav extends React.Component {
         let left = width * colIndex + "px"
         let style = { width: width + "px", height: height + "px", top: top, left: left }
         style.opacity = board ? 1.0 : 0.0
+        style.background = this.state.zoomOut ? "#EEE" : ""
         let index = [ rowIndex, colIndex ]
 
         return <Hammer onTap={ event => this.handleCellTap(event, index) }>
@@ -203,7 +204,7 @@ export default class DungeonNav extends React.Component {
     else
       style = {
         top: -(currentBoardIndex[0] * height - VIEWPORT_PADDING),
-        left: -(currentBoardIndex[1] * width - VIEWPORT_PADDING)
+        left: -(currentBoardIndex[1] * width - VIEWPORT_PADDING),
       }
 
     return <div className="DungeonNav__boards" style={ style }>{ boards }</div>
@@ -215,23 +216,25 @@ export default class DungeonNav extends React.Component {
     let { adjacent, indices } = this.getAdjacentBoards(this.state.grid, index)
     let adjacentPartials = []
 
-    Object.keys(adjacent).forEach(key => {
-      let partial, board = adjacent[key]
-      let classNames = `DungeonNav__addBoard DungeonNav__addBoard--${ key }` 
+    if(!this.state.zoomOut) {
+      Object.keys(adjacent).forEach(key => {
+        let partial, board = adjacent[key]
+        let classNames = `DungeonNav__addBoard DungeonNav__addBoard--${ key }` 
 
-      if(board === null)
-        partial = <Hammer key={ key } onTap={ () => this.addBoard(index, key) }>
-          <div className={ classNames }><span style={{ verticalAlign: "middle" }}><i className="fa fa-plus-circle"></i></span></div>
-        </Hammer>
-      else if(board === undefined)
-        partial = <div key={ key } className={ classNames }>Edge</div>
-      else if(board.get && board.get("id"))
-        partial = <Hammer key={ key } onTap={ () => this.moveToBoard(indices[key]) }>
-          <div className={ classNames + " DungeonNav__addBoard--moveToBoard" }>{ " " }</div>
-        </Hammer>
+        if(board === null)
+          partial = <Hammer key={ key } onTap={ () => this.addBoard(index, key) }>
+            <div className={ classNames }><span style={{ verticalAlign: "middle" }}><i className="fa fa-plus-circle"></i></span></div>
+          </Hammer>
+        else if(board === undefined)
+          partial = <div key={ key } className={ classNames }>Edge</div>
+        else if(board.get && board.get("id"))
+          partial = <Hammer key={ key } onTap={ () => this.moveToBoard(indices[key]) }>
+            <div className={ classNames + " DungeonNav__addBoard--moveToBoard" }>{ " " }</div>
+          </Hammer>
 
-      adjacentPartials.push(partial)
-    })
+        adjacentPartials.push(partial)
+      })
+    }
 
     return <div className="DungeonNav">
       <div className="DungeonNav__viewport" ref={ this.viewport }> 
