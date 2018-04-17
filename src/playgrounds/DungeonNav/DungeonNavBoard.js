@@ -23,10 +23,6 @@ export default class Board extends React.Component {
     let notes = this.state.notes
     let index = notes.findIndex(n => n.id === note.id)
     let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
-
-    if(!this.noteInBounds(newNote))
-      return
-
     let newNotes = notes.set(index, newNote)
 
     this.setState({ notes: newNotes })
