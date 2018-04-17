@@ -1,5 +1,5 @@
 import React from "react"
-import { BrowserRouter, Route, Link, NavLink } from "react-router-dom"
+import { BrowserRouter, Route, Link, NavLink, Redirect } from "react-router-dom"
 import Hammer from "react-hammerjs"
 
 import Zoom from "./playgrounds/Zoom"
@@ -77,13 +77,16 @@ export default class App extends React.Component {
         </ul>
       </div>
 
-   let globalOptions = {
-     showTools: this.state.showTools,
-     sampleData: this.state.sampleData
-   }
+    let globalOptions = {
+      showTools: this.state.showTools,
+      sampleData: this.state.sampleData
+    }
+
+    let redirect = (window.location.pathname === "/") ? <Redirect to="/dungeonnav" /> : ""
 
     return <BrowserRouter>
       <div className="App">
+        { redirect }
         { navigation }
         <div className="App__body">
           <Route path="/momentum" render={ () => <Momentum { ...globalOptions }/> } />
@@ -103,6 +106,7 @@ export default class App extends React.Component {
               <i className={ this.state.showTools ? "fa fa-expand" : "fa fa-compress" } />
             </div>
           </Hammer>
+
         </div>
       </div>
     </BrowserRouter>
