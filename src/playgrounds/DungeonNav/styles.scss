@@ -1,4 +1,9 @@
 .DungeonNav { 
+  display: grid;
+  grid-template-columns: 40px auto 40px;
+  grid-template-rows: 40px auto 40px;
+  height: 100%;
+
   .Note {
     position: absolute;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
@@ -25,11 +30,48 @@
   }
 
   .Board {
-    width: 100% !important;
-    height: 100% !important;
-    touch-action: none !important;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 3;
     box-sizing: border-box;
-    margin: 0;
     position: relative;
+    margin: 0;
+    width: auto;
+    height: auto;
   }
+}
+
+.DungeonNav__addBoard {
+  background: #AAA;
+  padding: 1em;
+  text-align: center;
+}
+
+.DungeonNav__addBoard--top {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.DungeonNav__addBoard--bottom {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 3;
+  grid-row-end: 4;
+}
+
+.DungeonNav__addBoard--left {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+.DungeonNav__addBoard--right {
+  grid-column-start: 3;
+  grid-column-end: 4;
+  grid-row-start: 2;
+  grid-row-end: 3;
 }

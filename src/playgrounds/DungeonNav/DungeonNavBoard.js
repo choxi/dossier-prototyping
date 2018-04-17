@@ -1,8 +1,6 @@
 import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
-import Slider from "react-rangeslider"
-import "react-rangeslider/lib/index.css"
 
 export default class Board extends React.Component {
   constructor() {
@@ -100,10 +98,8 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
-    return <div>
-      <div className="Board" ref={ this.boardRef }>
-        { notes }
-      </div>
+    return <div className="Board" ref={ this.boardRef }>
+      { notes }
     </div>
   }
 }
