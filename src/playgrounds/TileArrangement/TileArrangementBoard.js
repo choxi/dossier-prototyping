@@ -2,41 +2,50 @@ import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
 import Swipeable from 'react-swipeable'
+import SampleData from "../../sample-data"
 
 const CELL_PADDING = 20
 
 export default class Board extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
-    this.state = { 
-      notes: List([
-        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, deltaHeight: 0, deltaWidth: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" }
-      ]),
+    this.state = this.initialState(props)
+    this.boardRef = React.createRef()
+    this.setNoteRefs(this.state)
+  }
 
+  initialState(props) {
+    let sampleData = SampleData[props.sampleData]
+
+    let state = { 
+      notes: sampleData.notes.map(n => Object.assign({}, n, { deltaHeight: 0, deltaWidth: 0 })),
+      hoverCells: [],
       grid: [
         [ null, null, null ],
         [ null, null, null ],
         [ null, null, null ]
-      ],
-
-      hoverCells: [],
+      ]
     }
 
-    this.state.grid.forEach((row, rowIndex) => {
+    state.grid.forEach((row, rowIndex) => {
       row.forEach((col, colIndex) => {
-        this.state.grid[rowIndex][colIndex] = React.createRef()
+        state.grid[rowIndex][colIndex] = React.createRef()
       })
     })
 
+    return state
+  }
+
+  setNoteRefs(state) {
     this.noteRefs = {}
-    this.boardRef = React.createRef()
-    this.state.notes.forEach(note => {
+
+    state.notes.forEach(note => {
       this.noteRefs[note.id] = React.createRef()
     })
   }
 
-  componentDidMount() {
+  setNoteDimensions() {
     let newNotes = this.state.notes.map((note, index) => {
       let ref = this.noteRefs[note.id]
       let height = ref.current.domElement.clientHeight
@@ -46,6 +55,19 @@ export default class Board extends React.Component {
     })
 
     this.setState({ notes: newNotes })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.sampleData !== this.props.sampleData) {
+      let newState = this.initialState(nextProps)
+      this.setNoteRefs(newState)
+
+      this.setState(newState, () => this.setNoteDimensions())
+    }
+  }
+
+  componentDidMount() {
+    this.setNoteDimensions()
   }
 
   getHoverDimensions(state, cells) {
