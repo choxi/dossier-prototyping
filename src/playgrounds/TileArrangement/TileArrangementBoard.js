@@ -111,9 +111,10 @@ export default class Board extends React.Component {
   }
 
   handlePan(note, event) {
-    if(note.active)
-      this.handleResize(note, event)
-    else {
+    if(note.active) {
+      if(event.target.className === "Note__handleTarget")
+        this.handleResize(note, event)
+    } else {
       let notes = this.state.notes
       let index = notes.findIndex(n => n.id === note.id)
       let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
@@ -230,10 +231,10 @@ export default class Board extends React.Component {
       let notePartial
       if(note.imgSrc)
         if(note.active)
-          notePartial = <div className="Note Note--image" style={ style }>
-            <div className="Note__handle">
-              <img src={ note.imgSrc } />
-            </div>
+          notePartial = <div className="Note Note--active Note--image" style={ style }>
+            <img src={ note.imgSrc } />
+            <div className="Note__handle" />
+            <div className="Note__handleTarget" />
           </div>
         else
           notePartial = <div className="Note Note--image" style={ style }>
@@ -241,10 +242,10 @@ export default class Board extends React.Component {
           </div>
       else
         if(note.active)
-          notePartial = <div className="Note Note--text" style={ style }>
-            <div className="Note__handle">
-              <h5>{ note.text }</h5>
-            </div>
+          notePartial = <div className="Note Note--active Note--text" style={ style }>
+            <h5>{ note.text }</h5>
+            <div className="Note__handle" />
+            <div className="Note__handleTarget" />
           </div>
         else
           notePartial = <div className="Note Note--text" style={ style }>
