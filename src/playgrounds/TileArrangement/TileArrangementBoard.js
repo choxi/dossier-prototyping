@@ -107,7 +107,7 @@ export default class Board extends React.Component {
     let newNotes = this.state.notes.set(index, newNote)
 
 
-    this.setState({ notes: newNotes })
+    this.setState({ notes: newNotes, hoverCells: [] })
   }
 
   handlePan(note, event) {
