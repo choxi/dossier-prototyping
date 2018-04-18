@@ -7,24 +7,24 @@ export default class Board extends React.Component {
     super()
 
     this.state = { 
-      decelerationFactor: 0.1,
-      sensitivity: 10,
       notes: List([
-        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
-        { id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
-        { id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
-        { id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
-        { id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
-        { id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
-        { id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
-        { id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
-        { id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
-        { id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
-        { id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
-        { id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
-        { id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
-      ]) 
+        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" }
+      ]),
+
+      grid: [
+        [ null, null, null ],
+        [ null, null, null ],
+        [ null, null, null ]
+      ],
+
+      hoverCell: null,
     }
+
+    this.state.grid.forEach((row, rowIndex) => {
+      row.forEach((col, colIndex) => {
+        this.state.grid[rowIndex][colIndex] = React.createRef()
+      })
+    })
 
     this.noteRefs = {}
     this.boardRef = React.createRef()
@@ -37,45 +37,73 @@ export default class Board extends React.Component {
     let notes = this.state.notes
     let index = notes.findIndex(n => n.id === note.id)
     let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
-
-    if(!this.noteInBounds(newNote))
-      return
-
     let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes })
-  }
+    let cell = this.overGridCells(this.state, newNote)[0]
 
-  noteInBounds(note) {
-    let width = this.noteRefs[note.id].current.domElement.clientWidth
-    let height = this.noteRefs[note.id].current.domElement.clientHeight
-    let x = note.x + note.deltaX
-    let y = note.y + note.deltaY
-
-    if(x < 0 || (x + width) > this.boardRef.current.clientWidth) 
-      return false
-
-    if(y < 0 || (y + height) > this.boardRef.current.clientHeight)
-      return false
-
-    return true
+    this.setState({ notes: newNotes, hoverCell: cell })
   }
 
   handlePanEnd(note, event) {
     let notes = this.state.notes
     let index = notes.findIndex(n => n.id === note.id)
+    let cell  = this.overGridCells(this.state, note)[0]
+    let cellRef = this.state.grid[cell[0]][cell[1]]
+    let height = cellRef.current.clientHeight
+    let width = cellRef.current.clientWidth
+    let { top, left } = cellRef.current.getBoundingClientRect()
 
-    let newX = note.x + note.deltaX
-    let newY = note.y + note.deltaY
+    let newY = top
+    let newX = left
 
-    let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
-
-    if(!this.noteInBounds(newNote))
-      return
-
+    let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0, height: height, width: width })
     let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes })
+    this.setState({ notes: newNotes, hoverCell: null })
+  }
+
+  overGridCells(state, note) {
+    let overlap = []
+
+    state.grid.forEach((row, rowIndex) => {
+      row.forEach((col, colIndex) => {
+        let cell = state.grid[rowIndex][colIndex]
+        let cellRect = cell.current.getBoundingClientRect()
+        let noteRect = this.noteRefs[note.id].current.domElement.getBoundingClientRect()
+
+        if (!((noteRect.right < cellRect.left) ||
+              (noteRect.left > cellRect.right) ||
+              (noteRect.bottom < cellRect.top) ||
+              (noteRect.top > cellRect.bottom)))
+          overlap.push([ rowIndex, colIndex ])
+      })
+    })
+
+    return overlap
+  }
+
+  renderGrid(state) {
+    let cells = []
+    let grid = state.grid
+
+    grid.forEach((row, rowIndex) => {
+      let cellPartials = []
+
+      row.forEach((col, colIndex) => {
+        let cellClasses = "Board__cell"
+        if(state.hoverCell && state.hoverCell[0] === rowIndex && state.hoverCell[1] === colIndex)
+          cellClasses += " Board__cell--hover"
+
+        let ref = grid[rowIndex][colIndex]
+        let cell = <div ref={ ref } className={ cellClasses }></div>
+
+        cellPartials.push(cell)
+      })
+
+      cells.push(<div className="Board__row">{ cellPartials }</div>)
+    })
+
+    return cells
   }
 
   render() {
@@ -84,7 +112,9 @@ export default class Board extends React.Component {
 
       let style = { 
         left: note.x + note.deltaX,
-        top: note.y + note.deltaY
+        top: note.y + note.deltaY,
+        height: note.height - 20,
+        width: note.width - 20
       }
 
       let notePartial
@@ -102,10 +132,9 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
-    return <div>
-      <div className="Board" ref={ this.boardRef }>
-        { notes }
-      </div>
+    return <div className="Board" ref={ this.boardRef }>
+      { this.renderGrid(this.state) }
+      { notes }
     </div>
   }
 }
