@@ -30,6 +30,7 @@ $highlight: #9b59b6;
 
   .Note--active {
     border: 4px solid $highlight;
+    z-index: 8;
   }
 
   .Note__handleTarget {

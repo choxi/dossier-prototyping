@@ -100,8 +100,10 @@ export default class Board extends React.Component {
 
     let index = this.state.notes.findIndex(n => n.id === note.id)
     let newNotes = this.state.notes.set(index, newNote)
+    let newState = Object.assign({}, this.state, { notes: newNotes, hoverCells: [] })
+    newState = this.displaceNotes(newState, newNote)
 
-    this.setState({ notes: newNotes, hoverCells: [] })
+    this.setState(newState)
   }
 
   handlePan(note, event) {
@@ -117,6 +119,25 @@ export default class Board extends React.Component {
       let cells = this.overGridCells(this.state, newNote)
 
       this.setState({ notes: newNotes, hoverCells: cells })
+    }
+  }
+
+  handlePanEnd(note, event) {
+    if(note.active)
+      this.handleResizeEnd(note, event)
+    else {
+      let notes = this.state.notes
+      let index = notes.findIndex(n => n.id === note.id)
+      let cells  = this.overGridCells(this.state, note)
+
+      let newNote = Object.assign({}, note, { cells: cells, deltaX: 0, deltaY: 0 })
+      let newNotes = notes.set(index, newNote)
+      let newState = Object.assign({}, this.state, { notes: newNotes })
+
+      newState = this.displaceNotes(newState, newNote)
+      newState = Object.assign({}, newState, { hoverCells: [] })
+
+      this.setState(newState)
     }
   }
 
@@ -140,35 +161,26 @@ export default class Board extends React.Component {
     return overlapping
   }
 
-  handlePanEnd(note, event) {
-    if(note.active)
-      this.handleResizeEnd(note, event)
-    else {
-      let notes = this.state.notes
-      let index = notes.findIndex(n => n.id === note.id)
-      let cells  = this.overGridCells(this.state, note)
+  displaceNotes(state, note) {
+    let overlapping = this.overlappingNotes(state, note)
+    let newNotes = state.notes
 
-      let newNote = Object.assign({}, note, { cells: cells, deltaX: 0, deltaY: 0 })
-      let newNotes = notes.set(index, newNote)
-
-      let overlapping = this.overlappingNotes(this.state, newNote)
-      overlapping.forEach(overlapNote => {
-        if(overlapNote.cells) {
-          newNote.cells.forEach(cell => {
-            let newCells = overlapNote.cells.filter(otherCell => {
-              return !(cell[0] == otherCell[0] && cell[1] === otherCell[1])
-            })
-
-
-            overlapNote = Object.assign({}, overlapNote, { cells: newCells })
-            let overlapNoteIndex = newNotes.findIndex(n => n.id === overlapNote.id)
-            newNotes = newNotes.set(overlapNoteIndex, overlapNote)
+    overlapping.forEach(overlapNote => {
+      if(overlapNote.cells) {
+        note.cells.forEach(cell => {
+          let newCells = overlapNote.cells.filter(otherCell => {
+            return !(cell[0] == otherCell[0] && cell[1] === otherCell[1])
           })
-        }
-      })
 
-      this.setState({ notes: newNotes, hoverCells: [] })
-    }
+
+          overlapNote = Object.assign({}, overlapNote, { cells: newCells })
+          let overlapNoteIndex = newNotes.findIndex(n => n.id === overlapNote.id)
+          newNotes = newNotes.set(overlapNoteIndex, overlapNote)
+        })
+      }
+    })
+
+    return Object.assign({}, state, { notes: newNotes })
   }
 
   overGridCells(state, note) {
