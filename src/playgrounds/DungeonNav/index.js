@@ -3,6 +3,7 @@ import { default as Immutable, List, Map } from "immutable"
 import Hammer from "react-hammerjs"
 import uuid from "uuid/v4"
 
+import SampleData from "../../sample-data"
 import DungeonNavBoard from "./DungeonNavBoard"
 import "./styles.scss"
 
@@ -12,25 +13,25 @@ const VIEWPORT_PADDING = 100
 const ZOOM_OUT_SCALE = 0.25
 
 export default class DungeonNav extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
-    let initialNotes = List([
-      { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
-      { id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
-      { id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
-      { id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
-      { id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
-      { id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
-      { id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
-      { id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
-      { id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
-      { id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
-      { id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
-      { id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
-      { id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
-    ]) 
+    this.state = this.initialState(this.props)
+    this.viewport = React.createRef()
+    this.updateViewportDimensions = this.updateViewportDimensions.bind(this)
+  }
 
+  componentDidMount() {
+    window.addEventListener('resize', this.updateViewportDimensions)
+    this.updateViewportDimensions()
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateViewportDimensions)
+  }
+
+  initialState(props) {
+    let initialNotes = SampleData[props.sampleData].notes
     let initialBoard = { id: uuid(), notes: initialNotes }
 
     let grid = [ 
@@ -41,24 +42,17 @@ export default class DungeonNav extends React.Component {
       [ null, null, null,         null, null ],
     ]
 
-    this.state = { 
+    return { 
       grid: Immutable.fromJS(grid), 
       currentBoardIndex: [2, 2], 
       viewportDimensions: { width: 0, height: 0 },
       zoomOut: false
     }
-
-    this.viewport = React.createRef()
-    this.updateViewportDimensions = this.updateViewportDimensions.bind(this)
   }
 
-  componentDidMount() {
-    window.addEventListener('resize', this.updateViewportDimensions)
-    setTimeout(this.updateViewportDimensions, 100)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateViewportDimensions)
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.sampleData !== this.props.sampleData)
+      this.setState(this.initialState(nextProps), () => this.updateViewportDimensions())
   }
 
   updateViewportDimensions() {
