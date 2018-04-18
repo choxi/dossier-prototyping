@@ -22,9 +22,11 @@ export default class Board extends React.Component {
       notes: sampleData.notes.map(n => Object.assign({}, n, { deltaHeight: 0, deltaWidth: 0 })),
       hoverCells: [],
       grid: [
-        [ null, null, null ],
-        [ null, null, null ],
-        [ null, null, null ]
+        [ null, null, null, null, null ],
+        [ null, null, null, null, null ],
+        [ null, null, null, null, null ],
+        [ null, null, null, null, null ],
+        [ null, null, null, null, null ]
       ]
     }
 
@@ -120,9 +122,9 @@ export default class Board extends React.Component {
       let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
       let newNotes = notes.set(index, newNote)
 
-      let cell = this.overGridCells(this.state, newNote)[0]
+      let cells = this.overGridCells(this.state, newNote)
 
-      this.setState({ notes: newNotes, hoverCells: [ cell ] })
+      this.setState({ notes: newNotes, hoverCells: cells })
     }
   }
 
@@ -132,10 +134,13 @@ export default class Board extends React.Component {
     else {
       let notes = this.state.notes
       let index = notes.findIndex(n => n.id === note.id)
-      let cell  = this.overGridCells(this.state, note)[0]
+      let cells  = this.overGridCells(this.state, note)
+      let cell = cells[0]
+      let { cellsWidth, cellsHeight } = this.getHoverDimensions(this.state, cells)
       let cellRef = this.state.grid[cell[0]][cell[1]]
-      let height = cellRef.current.clientHeight
-      let width = cellRef.current.clientWidth
+
+      let height = cellRef.current.clientHeight * cellsHeight
+      let width = cellRef.current.clientWidth * cellsWidth
       let { top, left } = cellRef.current.getBoundingClientRect()
 
       let newY = top
