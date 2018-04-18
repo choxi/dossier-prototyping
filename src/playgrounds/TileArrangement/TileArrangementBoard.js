@@ -2,13 +2,15 @@ import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
 
+const CELL_PADDING = 20
+
 export default class Board extends React.Component {
   constructor() {
     super()
 
     this.state = { 
       notes: List([
-        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" }
+        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, deltaHeight: 0, deltaWidth: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" }
       ]),
 
       grid: [
@@ -17,7 +19,7 @@ export default class Board extends React.Component {
         [ null, null, null ]
       ],
 
-      hoverCell: null,
+      hoverCells: [],
     }
 
     this.state.grid.forEach((row, rowIndex) => {
@@ -33,33 +35,93 @@ export default class Board extends React.Component {
     })
   }
 
+  componentDidMount() {
+    let newNotes = this.state.notes.map((note, index) => {
+      let ref = this.noteRefs[note.id]
+      let height = ref.current.domElement.clientHeight
+      let width = ref.current.domElement.clientWidth
+
+      return Object.assign({}, note, { height: height, width: width })
+    })
+
+    this.setState({ notes: newNotes })
+  }
+
+  getHoverDimensions(state, cells) {
+    let topLeft = cells[0]
+    let bottomRight = cells[cells.length - 1]
+    let cellsHeight = bottomRight[0] - topLeft[0] + 1
+    let cellsWidth = bottomRight[1] - topLeft[1] + 1
+
+    return { cellsHeight: cellsHeight, cellsWidth: cellsWidth }
+  }
+
+  handleResize(note, event) {
+    let newNote = Object.assign({}, note, { deltaHeight: event.deltaY, deltaWidth: event.deltaX })
+    let index = this.state.notes.findIndex(n => n.id === note.id)
+    let newNotes = this.state.notes.set(index, newNote)
+    let cells = this.overGridCells(this.state, newNote)
+
+    this.setState({ notes: newNotes, hoverCells: cells })
+  }
+
+  handleResizeEnd(note, event) {
+    let cells = this.overGridCells(this.state, note)
+    let { cellsWidth, cellsHeight } = this.getHoverDimensions(this.state, cells)
+
+    let cell = cells[0]
+    let cellRef = this.state.grid[cell[0]][cell[1]]
+    let { top, left } = cellRef.current.getBoundingClientRect()
+    let newHeight = cellsHeight * cellRef.current.clientHeight
+    let newWidth = cellsWidth * cellRef.current.clientWidth
+
+    let newNote = Object.assign({}, note, { 
+      x: left, y: top, height: newHeight, width: newWidth, 
+      deltaHeight: 0, deltaWidth: 0, deltaX: 0, deltaY: 0
+    })
+
+    let index = this.state.notes.findIndex(n => n.id === note.id)
+    let newNotes = this.state.notes.set(index, newNote)
+
+
+    this.setState({ notes: newNotes })
+  }
+
   handlePan(note, event) {
-    let notes = this.state.notes
-    let index = notes.findIndex(n => n.id === note.id)
-    let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
-    let newNotes = notes.set(index, newNote)
+    if(note.active)
+      this.handleResize(note, event)
+    else {
+      let notes = this.state.notes
+      let index = notes.findIndex(n => n.id === note.id)
+      let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
+      let newNotes = notes.set(index, newNote)
 
-    let cell = this.overGridCells(this.state, newNote)[0]
+      let cell = this.overGridCells(this.state, newNote)[0]
 
-    this.setState({ notes: newNotes, hoverCell: cell })
+      this.setState({ notes: newNotes, hoverCells: [ cell ] })
+    }
   }
 
   handlePanEnd(note, event) {
-    let notes = this.state.notes
-    let index = notes.findIndex(n => n.id === note.id)
-    let cell  = this.overGridCells(this.state, note)[0]
-    let cellRef = this.state.grid[cell[0]][cell[1]]
-    let height = cellRef.current.clientHeight
-    let width = cellRef.current.clientWidth
-    let { top, left } = cellRef.current.getBoundingClientRect()
+    if(note.active)
+      this.handleResizeEnd(note, event)
+    else {
+      let notes = this.state.notes
+      let index = notes.findIndex(n => n.id === note.id)
+      let cell  = this.overGridCells(this.state, note)[0]
+      let cellRef = this.state.grid[cell[0]][cell[1]]
+      let height = cellRef.current.clientHeight
+      let width = cellRef.current.clientWidth
+      let { top, left } = cellRef.current.getBoundingClientRect()
 
-    let newY = top
-    let newX = left
+      let newY = top
+      let newX = left
 
-    let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0, height: height, width: width })
-    let newNotes = notes.set(index, newNote)
+      let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0, height: height, width: width })
+      let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes, hoverCell: null })
+      this.setState({ notes: newNotes, hoverCells: [] })
+    }
   }
 
   overGridCells(state, note) {
@@ -82,6 +144,21 @@ export default class Board extends React.Component {
     return overlap
   }
 
+  isHoverCell(state, cellIndex) {
+    if(state.hoverCells.length === 0)
+      return false
+    else {
+      let isHover = false
+
+      state.hoverCells.forEach(hoverCell => {
+        if(hoverCell[0] === cellIndex[0] && hoverCell[1] === cellIndex[1])
+          isHover = true
+      })
+
+      return isHover
+    }
+  }
+
   renderGrid(state) {
     let cells = []
     let grid = state.grid
@@ -91,7 +168,7 @@ export default class Board extends React.Component {
 
       row.forEach((col, colIndex) => {
         let cellClasses = "Board__cell"
-        if(state.hoverCell && state.hoverCell[0] === rowIndex && state.hoverCell[1] === colIndex)
+        if(this.isHoverCell(this.state, [ rowIndex, colIndex]))
           cellClasses += " Board__cell--hover"
 
         let ref = grid[rowIndex][colIndex]
@@ -106,28 +183,58 @@ export default class Board extends React.Component {
     return cells
   }
 
+  handleTap(note) {
+    let index = this.state.notes.findIndex(n => n.id === note.id)
+    let newNote = Object.assign({}, note, { active: !note.active })
+    let newNotes = this.state.notes.set(index, newNote)
+
+    this.setState({ notes: newNotes })
+  }
+
   render() {
     let notes = this.state.notes.map(note => {
-      let options = { preventDefault: true }
-
       let style = { 
-        left: note.x + note.deltaX,
-        top: note.y + note.deltaY,
-        height: note.height - 20,
-        width: note.width - 20
+        left: note.x + note.deltaX + CELL_PADDING,
+        top: note.y + note.deltaY + CELL_PADDING
       }
+
+      if(note.height)
+        style.height = note.height + note.deltaHeight - 2*CELL_PADDING
+
+      if(note.width)
+        style.width = note.width + note.deltaWidth - 2*CELL_PADDING
 
       let notePartial
       if(note.imgSrc)
-        notePartial = <div className="Note Note--image" style={ style }>
-          <img src={ note.imgSrc } />
-        </div>
-       else
-        notePartial = <div className="Note Note--text" style={ style }>
-          <h5>{ note.text }</h5>
-        </div>
+        if(note.active)
+          notePartial = <div className="Note Note--image" style={ style }>
+            <div className="Note__handle">
+              <img src={ note.imgSrc } />
+            </div>
+          </div>
+        else
+          notePartial = <div className="Note Note--image" style={ style }>
+            <img src={ note.imgSrc } />
+          </div>
+      else
+        if(note.active)
+          notePartial = <div className="Note Note--text" style={ style }>
+            <div className="Note__handle">
+              <h5>{ note.text }</h5>
+            </div>
+          </div>
+        else
+          notePartial = <div className="Note Note--text" style={ style }>
+            <h5>{ note.text }</h5>
+          </div>
 
-      return <Hammer ref={ this.noteRefs[note.id] } options={ options } key={ note.id } onPan={ event => this.handlePan(note, event) } onPanEnd={ event => this.handlePanEnd(note, event) }>
+      return <Hammer 
+        key={ note.id } 
+        ref={ this.noteRefs[note.id] } 
+        onPan={ event => this.handlePan(note, event) } 
+        onPanEnd={ event => this.handlePanEnd(note, event) }
+        onTap={ event => this.handleTap(note) }
+      >
         { notePartial }
       </Hammer>
     })
