@@ -1,4 +1,5 @@
 $highlight: #9b59b6;
+$softHighlight: #3498db;
 
 .TileArrangement { 
   .Note {
@@ -33,12 +34,16 @@ $highlight: #9b59b6;
     z-index: 8;
   }
 
+  .Note--dragging {
+    z-index: 8;
+  }
+
   .Note__handleTarget {
     position: absolute;
-    bottom: -200px;
-    right: -200px;
-    width: 400px;
-    height: 400px;
+    bottom: -100px;
+    right: -100px;
+    width: 200px;
+    height: 200px;
     background: transparent;
   }
 
@@ -74,6 +79,8 @@ $highlight: #9b59b6;
   }
 
   .Board__cell--hover {
-    border: 1px solid red;
+    border: 1px solid $highlight;
+    background: transparentize($highlight, 0.75);
+    z-index: 9;
   }
 }

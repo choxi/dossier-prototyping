@@ -113,7 +113,7 @@ export default class Board extends React.Component {
     } else {
       let notes = this.state.notes
       let index = notes.findIndex(n => n.id === note.id)
-      let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
+      let newNote = Object.assign({}, note, { dragging: true, deltaX: event.deltaX, deltaY: event.deltaY })
       let newNotes = notes.set(index, newNote)
 
       let cells = this.overGridCells(this.state, newNote)
@@ -130,7 +130,7 @@ export default class Board extends React.Component {
       let index = notes.findIndex(n => n.id === note.id)
       let cells  = this.overGridCells(this.state, note)
 
-      let newNote = Object.assign({}, note, { cells: cells, deltaX: 0, deltaY: 0 })
+      let newNote = Object.assign({}, note, { cells: cells, dragging: false, deltaX: 0, deltaY: 0 })
       let newNotes = notes.set(index, newNote)
       let newState = Object.assign({}, this.state, { notes: newNotes })
 
@@ -282,27 +282,31 @@ export default class Board extends React.Component {
           style.width = note.width + note.deltaWidth - 2*CELL_PADDING
       }
 
+      let noteClasses = "Note" 
+      if(note.dragging)
+        noteClasses += " Note--dragging"
+
       let notePartial
       if(note.imgSrc)
         if(note.active)
-          notePartial = <div className="Note Note--active Note--image" style={ style }>
+          notePartial = <div className={ noteClasses + " Note--active Note--image" } style={ style }>
             <img src={ note.imgSrc } />
             <div className="Note__handle" />
             <div className="Note__handleTarget" />
           </div>
         else
-          notePartial = <div className="Note Note--image" style={ style }>
+          notePartial = <div className={ noteClasses + " Note--image" } style={ style }>
             <img src={ note.imgSrc } />
           </div>
       else
         if(note.active)
-          notePartial = <div className="Note Note--active Note--text" style={ style }>
+          notePartial = <div className={ noteClasses + " Note--active Note--text" } style={ style }>
             <h5>{ note.text }</h5>
             <div className="Note__handle" />
             <div className="Note__handleTarget" />
           </div>
         else
-          notePartial = <div className="Note Note--text" style={ style }>
+          notePartial = <div className={ noteClasses + " Note--text" } style={ style }>
             <h5>{ note.text }</h5>
           </div>
 
