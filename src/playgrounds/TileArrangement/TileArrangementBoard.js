@@ -1,6 +1,7 @@
 import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
+import Swipeable from 'react-swipeable'
 
 const CELL_PADDING = 20
 
@@ -239,9 +240,11 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
-    return <div className="Board" ref={ this.boardRef }>
-      { this.renderGrid(this.state) }
-      { notes }
-    </div>
+    return <Swipeable preventDefaultTouchmoveEvent={ true } onSwipedUp={ () => {} } onSwipedDown={ () => {} }>
+      <div className="Board" ref={ this.boardRef }>
+        { this.renderGrid(this.state) }
+        { notes }
+      </div>
+    </Swipeable>
   }
 }
