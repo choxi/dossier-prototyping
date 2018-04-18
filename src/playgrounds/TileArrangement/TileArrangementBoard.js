@@ -19,7 +19,7 @@ export default class Board extends React.Component {
     let sampleData = SampleData[props.sampleData]
 
     let state = { 
-      notes: sampleData.notes.map(n => Object.assign({}, n, { deltaHeight: 0, deltaWidth: 0 })),
+      notes: sampleData.notes.map(n => Object.assign({}, n, { cells: [], deltaHeight: 0, deltaWidth: 0 })),
       hoverCells: [],
       grid: [
         [ null, null, null, null, null ],
@@ -94,20 +94,12 @@ export default class Board extends React.Component {
     let cells = this.overGridCells(this.state, note)
     let { cellsWidth, cellsHeight } = this.getHoverDimensions(this.state, cells)
 
-    let cell = cells[0]
-    let cellRef = this.state.grid[cell[0]][cell[1]]
-    let { top, left } = cellRef.current.getBoundingClientRect()
-    let newHeight = cellsHeight * cellRef.current.clientHeight
-    let newWidth = cellsWidth * cellRef.current.clientWidth
-
     let newNote = Object.assign({}, note, { 
-      x: left, y: top, height: newHeight, width: newWidth, 
-      deltaHeight: 0, deltaWidth: 0, deltaX: 0, deltaY: 0
+      deltaHeight: 0, deltaWidth: 0, deltaX: 0, deltaY: 0, cells: cells
     })
 
     let index = this.state.notes.findIndex(n => n.id === note.id)
     let newNotes = this.state.notes.set(index, newNote)
-
 
     this.setState({ notes: newNotes, hoverCells: [] })
   }
@@ -128,6 +120,26 @@ export default class Board extends React.Component {
     }
   }
 
+  overlappingNotes(state, note) {
+    let overlapping = []
+    let noteRect = this.noteRefs[note.id].current.domElement.getBoundingClientRect()
+
+    state.notes.forEach(n => {
+      let noteBRect = this.noteRefs[n.id].current.domElement.getBoundingClientRect()
+
+      if(n.id === note.id)
+        return
+
+      if (!((noteRect.right < noteBRect.left) ||
+                (noteRect.left > noteBRect.right) ||
+                (noteRect.bottom < noteBRect.top) ||
+                (noteRect.top > noteBRect.bottom)))
+        overlapping.push(n)
+    })
+
+    return overlapping
+  }
+
   handlePanEnd(note, event) {
     if(note.active)
       this.handleResizeEnd(note, event)
@@ -135,19 +147,25 @@ export default class Board extends React.Component {
       let notes = this.state.notes
       let index = notes.findIndex(n => n.id === note.id)
       let cells  = this.overGridCells(this.state, note)
-      let cell = cells[0]
-      let { cellsWidth, cellsHeight } = this.getHoverDimensions(this.state, cells)
-      let cellRef = this.state.grid[cell[0]][cell[1]]
 
-      let height = cellRef.current.clientHeight * cellsHeight
-      let width = cellRef.current.clientWidth * cellsWidth
-      let { top, left } = cellRef.current.getBoundingClientRect()
-
-      let newY = top
-      let newX = left
-
-      let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0, height: height, width: width })
+      let newNote = Object.assign({}, note, { cells: cells, deltaX: 0, deltaY: 0 })
       let newNotes = notes.set(index, newNote)
+
+      let overlapping = this.overlappingNotes(this.state, newNote)
+      overlapping.forEach(overlapNote => {
+        if(overlapNote.cells) {
+          newNote.cells.forEach(cell => {
+            let newCells = overlapNote.cells.filter(otherCell => {
+              return !(cell[0] == otherCell[0] && cell[1] === otherCell[1])
+            })
+
+
+            overlapNote = Object.assign({}, overlapNote, { cells: newCells })
+            let overlapNoteIndex = newNotes.findIndex(n => n.id === overlapNote.id)
+            newNotes = newNotes.set(overlapNoteIndex, overlapNote)
+          })
+        }
+      })
 
       this.setState({ notes: newNotes, hoverCells: [] })
     }
@@ -222,16 +240,35 @@ export default class Board extends React.Component {
 
   render() {
     let notes = this.state.notes.map(note => {
-      let style = { 
-        left: note.x + note.deltaX + CELL_PADDING,
-        top: note.y + note.deltaY + CELL_PADDING
+      let style
+
+      if(note.cells.length > 0) {
+        let cell = note.cells[0]
+        let cellRef = this.state.grid[cell[0]][cell[1]]
+        let { cellsWidth, cellsHeight } = this.getHoverDimensions(this.state, note.cells)
+
+        let height = cellRef.current.clientHeight * cellsHeight
+        let width = cellRef.current.clientWidth * cellsWidth
+        let { top, left } = cellRef.current.getBoundingClientRect()
+
+        style = {
+          top: top + note.deltaY + CELL_PADDING,
+          left: left + note.deltaX + CELL_PADDING,
+          height: height + note.deltaHeight - 2*CELL_PADDING,
+          width: width + note.deltaWidth - 2*CELL_PADDING
+        }
+      } else {
+        style = { 
+          left: note.x + note.deltaX + CELL_PADDING,
+          top: note.y + note.deltaY + CELL_PADDING
+        }
+
+        if(note.height)
+          style.height = note.height + note.deltaHeight - 2*CELL_PADDING
+
+        if(note.width)
+          style.width = note.width + note.deltaWidth - 2*CELL_PADDING
       }
-
-      if(note.height)
-        style.height = note.height + note.deltaHeight - 2*CELL_PADDING
-
-      if(note.width)
-        style.width = note.width + note.deltaWidth - 2*CELL_PADDING
 
       let notePartial
       if(note.imgSrc)
