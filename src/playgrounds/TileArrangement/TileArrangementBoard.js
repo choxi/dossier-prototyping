@@ -5,6 +5,8 @@ import Swipeable from 'react-swipeable'
 import SampleData from "../../sample-data"
 
 const CELL_PADDING = 20
+const GRID_ROWS = 5
+const GRID_COLS = 5
 
 export default class Board extends React.Component {
   constructor(props) {
@@ -21,22 +23,25 @@ export default class Board extends React.Component {
     let state = { 
       notes: sampleData.notes.map(n => Object.assign({}, n, { cells: [], deltaHeight: 0, deltaWidth: 0 })),
       hoverCells: [],
-      grid: [
-        [ null, null, null, null, null ],
-        [ null, null, null, null, null ],
-        [ null, null, null, null, null ],
-        [ null, null, null, null, null ],
-        [ null, null, null, null, null ]
-      ]
+      grid: this.createGrid(GRID_ROWS, GRID_COLS)
     }
 
-    state.grid.forEach((row, rowIndex) => {
-      row.forEach((col, colIndex) => {
-        state.grid[rowIndex][colIndex] = React.createRef()
-      })
-    })
-
     return state
+  }
+
+  createGrid(rows, columns) {
+    let grid = []
+
+    for(let r = 0; r < rows; r++) {
+      let row = []
+
+      for(let c = 0; c < columns; c++)
+        row.push(React.createRef())
+
+      grid.push(row)
+    }
+
+    return grid
   }
 
   setNoteRefs(state) {
