@@ -65,7 +65,7 @@ export default class Board extends React.Component {
 
   handleSwipe(event, direction) {
     let newEvent = Object.assign({}, event, { direction: direction })
-    if(event.target.className === "Board")
+    if(event.target.className === "Board" && !(event.changedTouches[0] && event.changedTouches[0].touchType === "stylus"))
       this.props.onSwipe(newEvent)
   }
 

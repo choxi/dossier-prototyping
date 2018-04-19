@@ -8,8 +8,8 @@ import SampleData from "../../sample-data"
 import AnnotationsBoard from "./AnnotationsBoard"
 import "./styles.scss"
 
-const MAX_ROWS = 5
-const MAX_COLS = 5
+const MAX_ROWS = 2
+const MAX_COLS = 2
 const VIEWPORT_PADDING = 100
 const ZOOM_OUT_SCALE = 0.25
 
@@ -41,16 +41,13 @@ export default class DungeonNav extends React.Component {
     let initialBoard = { id: uuid(), notes: initialNotes }
 
     let grid = [ 
-      [ null, null, null,         null, null ],
-      [ null, null, null,         null, null ],
-      [ null, null, initialBoard, null, null ],
-      [ null, null, null,         null, null ],
-      [ null, null, null,         null, null ],
+      [ null, null ],
+      [ null, initialBoard ]
     ]
 
     return { 
       grid: Immutable.fromJS(grid), 
-      currentBoardIndex: [0, 0], 
+      currentBoardIndex: [1, 1], 
       viewportDimensions: { width: 0, height: 0 },
       zoomOut: false,
       logs: []
@@ -212,7 +209,7 @@ export default class DungeonNav extends React.Component {
     let canvasWidth = dim.width * MAX_COLS
     let canvasHeight = dim.height * MAX_ROWS
 
-    return <div onTouchStart={ event => this.handlePointer(event) }> 
+    return <div onTouchMove={ event => this.handlePointer(event) }> 
       <div className="DungeonNav__boards" style={ style }>
         <canvas ref={ this.canvas } className="Annotations__canvas" width={ canvasWidth } height={ canvasHeight } > </canvas>
         { boards }
@@ -221,17 +218,17 @@ export default class DungeonNav extends React.Component {
   }
 
   handlePointer(event) {
-    if(event.target.className !== "Board")
+    if(event.target.className !== "Board" || (event.touches[0] && event.touches[0].touchType !== "stylus"))
       return
+    else
+      event.preventDefault()
 
     let { width, height } = this.state.viewportDimensions
     let ctx = this.canvas.current.getContext("2d")
     let x = (event.touches[0].clientX - VIEWPORT_PADDING) + this.state.currentBoardIndex[1] * (width - 2*VIEWPORT_PADDING)
     let y = (event.touches[0].clientY - VIEWPORT_PADDING) + this.state.currentBoardIndex[0] * (height - 2*VIEWPORT_PADDING)
 
-    ctx.fillStyle = "green"
-    ctx.fillRect(x, y, 10, 10)
-    this.log(`draw: (${x}, ${y}) `)
+    ctx.fillRect(x, y, 5, 5)
   }
 
   render() {
@@ -265,7 +262,6 @@ export default class DungeonNav extends React.Component {
     </div>
 
     return <div className="Annotations">
-      { consolePartial }
       <div className="DungeonNav__viewport" ref={ this.viewport }> 
         { adjacentPartials }
         { this.renderBoards(this.state) } 
