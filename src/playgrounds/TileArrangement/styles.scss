@@ -81,6 +81,5 @@ $softHighlight: #3498db;
   .Board__cell--hover {
     border: 1px solid $highlight;
     background: transparentize($highlight, 0.75);
-    z-index: 9;
   }
 }
