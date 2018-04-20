@@ -228,6 +228,7 @@ export default class DungeonNav extends React.Component {
     let x = (event.touches[0].clientX - VIEWPORT_PADDING) + this.state.currentBoardIndex[1] * (width - 2*VIEWPORT_PADDING)
     let y = (event.touches[0].clientY - VIEWPORT_PADDING) + this.state.currentBoardIndex[0] * (height - 2*VIEWPORT_PADDING)
 
+    ctx.fillStyle = "#3498db"
     ctx.fillRect(x, y, 5, 5)
   }
 
