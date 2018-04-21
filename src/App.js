@@ -15,6 +15,7 @@ import WhiskyAndGin3 from "./playgrounds/WhiskyAndGin3"
 import DungeonNav from "./playgrounds/DungeonNav"
 import TileArrangement from "./playgrounds/TileArrangement"
 import Annotations from "./playgrounds/Annotations"
+import Gestures from "./playgrounds/Gestures"
 
 import "./App.scss"
 import 'font-awesome/css/font-awesome.min.css'
@@ -77,6 +78,10 @@ export default class App extends React.Component {
             <p>annotations</p>
           </NavLink></li>
 
+          <li><NavLink className={ linkClass } activeClassName="App__navigation__link--active" to="/gestures">
+            <p>stylus gestures</p>
+          </NavLink></li>
+
           <h3>Sample Data</h3>
           <li>
             <a className={ sampleData === "cocktails" ? "App__navigation__link--active" : linkClass } onClick={ () => this.setState({ sampleData: "cocktails" }) }>Cocktails</a>
@@ -112,6 +117,7 @@ export default class App extends React.Component {
           <Route path="/dungeonnav" render={ () => <DungeonNav { ...globalOptions } /> } />
           <Route path="/tilearrangement" render={ () => <TileArrangement { ...globalOptions } /> } />
           <Route path="/annotations" render={ () => <Annotations { ...globalOptions } /> } />
+          <Route path="/gestures" render={ () => <Gestures { ...globalOptions } /> } />
 
           <Hammer onTap={ () => this.setState({ showTools: !this.state.showTools }) }>
             <div className="App__toolsToggle">
