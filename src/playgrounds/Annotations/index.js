@@ -211,13 +211,14 @@ export default class DungeonNav extends React.Component {
 
     return <div onTouchMove={ event => this.handlePointer(event) }> 
       <div className="DungeonNav__boards" style={ style }>
-        <canvas ref={ this.canvas } className="Annotations__canvas" width={ canvasWidth } height={ canvasHeight } > </canvas>
         { boards }
       </div>
     </div>
   }
 
   handlePointer(event) {
+    console.log("handlePointer")
+
     if(event.target.className !== "Board" || (event.touches[0] && event.touches[0].touchType !== "stylus"))
       return
     else

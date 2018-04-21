@@ -9,23 +9,10 @@ export default class Board extends React.Component {
     super()
 
     this.state = { 
-      decelerationFactor: 0.1,
-      sensitivity: 10,
       notes: List([
-        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" },
-        { id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
-        { id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
-        { id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
-        { id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
-        { id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
-        { id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
-        { id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
-        { id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
-        { id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
-        { id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
-        { id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
-        { id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
-      ]) 
+        { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" }
+      ]),
+      viewportDimensions: { width: 100, height: 100 }
     }
 
     this.noteRefs = {}
@@ -33,12 +20,25 @@ export default class Board extends React.Component {
     this.state.notes.forEach(note => {
       this.noteRefs[note.id] = React.createRef()
     })
+
+    this.canvas = React.createRef()
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.updateViewportDimensions)
+    this.updateViewportDimensions()
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateViewportDimensions)
+  }
+
+  updateViewportDimensions() {
+    let { clientWidth, clientHeight } = this.boardRef.current
+    this.setState({ viewportDimensions: { width: clientWidth, height: clientHeight }})
   }
 
   handlePan(note, event) {
-    event.preventDefault()
-    event.srcEvent.preventDefault()
-
     let notes = this.state.notes
     let index = notes.findIndex(n => n.id === note.id)
     let newNote = Object.assign({}, note, { deltaX: event.deltaX, deltaY: event.deltaY })
@@ -49,6 +49,20 @@ export default class Board extends React.Component {
     let newNotes = notes.set(index, newNote)
 
     this.setState({ notes: newNotes })
+  }
+
+  handlePointer(event) {
+    if(event.target.className !== "Gestures__canvas" || (false && event.touches[0] && event.touches[0].touchType !== "stylus"))
+      return
+    else
+      event.preventDefault()
+
+    let ctx = this.canvas.current.getContext("2d")
+    let x = event.touches[0].clientX
+    let y = event.touches[0].clientY
+
+    ctx.fillStyle = "#3498db"
+    ctx.fillRect(x, y, 5, 5)
   }
 
   noteInBounds(note) {
@@ -80,31 +94,7 @@ export default class Board extends React.Component {
 
     let newNotes = notes.set(index, newNote)
 
-    this.setState({ notes: newNotes }, () => this.handleMomentum(note, event.velocityX, event.velocityY))
-  }
-
-  handleMomentum(note, velocityX, velocityY, deceleration=1.0) {
-    if(deceleration <= 0.1)
-      return
-   
-    let notes = this.state.notes
-    note = notes.find(n => n.id === note.id)
-    let index = notes.findIndex(n => n.id === note.id)
-
-    let newX = note.x + velocityX * this.state.sensitivity
-    let newY = note.y + velocityY * this.state.sensitivity
-
-    let newNote = Object.assign({}, note, { x: newX, y: newY, deltaX: 0, deltaY: 0 })
-
-    if(!this.noteInBounds(newNote))
-      return
-
-    let newNotes = notes.set(index, newNote)
-
-    this.setState({ notes: newNotes }, () => {
-      deceleration = deceleration * (1 - this.state.decelerationFactor)
-      setTimeout(() => this.handleMomentum(note, velocityX, velocityY, deceleration), 5)
-    })
+    this.setState({ notes: newNotes })
   }
 
   render() {
@@ -131,8 +121,11 @@ export default class Board extends React.Component {
       </Hammer>
     })
 
-    return <div>
+    let { width, height } = this.state.viewportDimensions
+
+    return <div onTouchMove={ event => this.handlePointer(event) }> 
       <div className="Board" ref={ this.boardRef }>
+        <canvas className="Gestures__canvas" ref={ this.canvas } width={ width } height={ height } />
         { notes }
       </div>
     </div>
