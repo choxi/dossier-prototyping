@@ -2,8 +2,8 @@ import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
 import { findIntersection, findSegmentIntersection } from "line-intersection"
-
-const sameSign = (a, b) => (a * b) > 0;
+import ShapeDetector from "shape-detector"
+import Swipeable from "react-swipeable"
 
 export default class Board extends React.Component {
   constructor() {
@@ -13,18 +13,29 @@ export default class Board extends React.Component {
       notes: List([
         { id: 1, x: 600, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/MRpLVCa.png" }
       ]),
+      inbox: List([
+        { id: 2, x: 700, y: 140, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/Ja2emXY.png" },
+        { id: 3, x: 640, y: 240, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/bGrGdiO.png" },
+        { id: 4, x: 800, y: 100, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/GGc7lyo.png" },
+        { id: 5, x: 730, y: 110, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/CyNRme7.png" },
+        { id: 6, x: 790, y: 100, deltaX: 0, deltaY: 0, text: "Mayhaw Cocktail" },
+        { id: 7, x: 830, y: 216, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/1m0iz7e.png" },
+        { id: 8, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Alaska Cocktail" },
+        { id: 9, x: 800, y: 220, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/rlVzV5o.png" },
+        { id: 10, x: 900, y: 100, deltaX: 0, deltaY: 0, text: "Gold Cold Blackberry Smash" },
+        { id: 11, x: 820, y: 190, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/3piuYAz.png" },
+        { id: 12, x: 910, y: 175, deltaX: 0, deltaY: 0, text: "Twisted Thistle" },
+        { id: 13, x: 870, y: 221, deltaX: 0, deltaY: 0, imgSrc: "https://i.imgur.com/qU4GDxC.png" }
+      ]),
       viewportDimensions: { width: 100, height: 100 },
       gestures: [],
       currentGesture: null
     }
 
-    this.noteRefs = {}
-    this.boardRef = React.createRef()
-    this.state.notes.forEach(note => {
-      this.noteRefs[note.id] = React.createRef()
-    })
-
     this.canvas = React.createRef()
+    this.boardRef = React.createRef()
+    this.state.notes.forEach(note => note.ref = React.createRef())
+    this.state.inbox.forEach(note => note.ref = React.createRef())
   }
 
   componentDidMount() {
@@ -56,7 +67,7 @@ export default class Board extends React.Component {
 
   isStylus(event) {
     return !(
-      event.target.className !== "Board" || (false && event.touches[0] && event.touches[0].touchType !== "stylus")
+      event.target.className !== "Board" || (event.touches[0] && event.touches[0].touchType !== "stylus")
     )
   }
 
@@ -106,45 +117,40 @@ export default class Board extends React.Component {
   }
 
   detectGestures(state) {
-    if(state.gestures.length < 2)
-      return
+    let detector = new ShapeDetector(ShapeDetector.defaultShapes)
+    let lastGesture = state.gestures[state.gestures.length - 1]
+    let stroke = lastGesture.map(touch => ({ x: touch.clientX, y: touch.clientY }))
+    let gesture = detector.spot(stroke)
+    let lastPoint = stroke[stroke.length - 1]
 
-    let gestureA = state.gestures[state.gestures.length - 2]
-    let gestureB = state.gestures[state.gestures.length - 1]
+    if(gesture.pattern && gesture.score > 0.6) {
+      let targetNotes = this.findNotesAtCoord(state, lastPoint)
 
-    let x1 = gestureA[0].clientX
-    let y1 = gestureA[0].clientY
+      if(gesture.pattern === "triangle") {
+        let newNotes = state.notes.filter(n => !targetNotes.some(tn => tn.id === n.id))
+        this.setState({ notes: newNotes }, () => this.clearCanvas())
+      } else if(gesture.pattern === "square") {
+        let newNote = state.inbox.get(0)
+        newNote = Object.assign({}, newNote, { x: lastPoint.x, y: lastPoint.y })
 
-    let x2 = gestureA[gestureA.length - 1].clientX
-    let y2 = gestureA[gestureA.length - 1].clientY
+        let newInbox = state.inbox.remove(0)
+        let newNotes = state.notes.push(newNote)
 
-    let x3 = gestureB[0].clientX
-    let y3 = gestureB[0].clientY
-
-    let x4 = gestureB[gestureB.length - 1].clientX
-    let y4 = gestureB[gestureB.length - 1].clientY
-
-    let coordinates = [
-      { x: x1, y: y1 }, { x: x2, y: y2 }, 
-      { x: x3, y: y3 }, { x: x4, y: y4 }
-    ]
-
-    if(findSegmentIntersection(coordinates)) {
-      let intersection = findIntersection(coordinates)
-      let targetNotes = this.findNotesAtCoord(state, intersection)
-      let newNotes = state.notes.filter(n => !targetNotes.some(tn => tn.id === n.id))
-      this.setState({ notes: newNotes }, () => {
-        let ctx = this.canvas.current.getContext("2d")
-        ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height)
-      })
+        this.setState({ notes: newNotes, inbox: newInbox }, () => this.clearCanvas())
+      }
     }
+  }
+
+  clearCanvas() {
+    let ctx = this.canvas.current.getContext("2d")
+    ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height)
   }
 
   findNotesAtCoord(state, { x, y }) {
     let notes = []
 
     state.notes.forEach(note => {
-      let { clientWidth, clientHeight } = this.noteRefs[note.id].current.domElement
+      let { clientWidth, clientHeight } = note.ref.current.domElement
       let minX = note.x
       let maxX = note.x + clientWidth
       let minY = note.y
@@ -158,8 +164,8 @@ export default class Board extends React.Component {
   }
 
   noteInBounds(note) {
-    let width = this.noteRefs[note.id].current.domElement.clientWidth
-    let height = this.noteRefs[note.id].current.domElement.clientHeight
+    let width = note.ref.current.domElement.clientWidth
+    let height = note.ref.current.domElement.clientHeight
     let x = note.x + note.deltaX
     let y = note.y + note.deltaY
 
@@ -208,14 +214,14 @@ export default class Board extends React.Component {
           <h5>{ note.text }</h5>
         </div>
 
-      return <Hammer ref={ this.noteRefs[note.id] } options={ options } key={ note.id } onPan={ event => this.handlePan(note, event) } onPanEnd={ event => this.handlePanEnd(note, event) }>
+      return <Hammer ref={ note.ref } options={ options } key={ note.id } onPan={ event => this.handlePan(note, event) } onPanEnd={ event => this.handlePanEnd(note, event) }>
         { notePartial }
       </Hammer>
     })
 
     let { width, height } = this.state.viewportDimensions
 
-    return <div>
+    return <Swipeable preventDefaultTouchmoveEvent={ true } onSwipedUp={ () => {} } onSwipedDown={ () => {} }>
       <canvas className="Gestures__canvas" ref={ this.canvas } width={ width } height={ height } />
       <div className="Board" 
         ref={ this.boardRef }
@@ -225,6 +231,6 @@ export default class Board extends React.Component {
       >
         { notes }
       </div>
-    </div>
+    </Swipeable>
   }
 }

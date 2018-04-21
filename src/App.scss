@@ -1,4 +1,4 @@
-$grid-color: #DDD;
+$grid-color: #EEE;
 $toolsHighlight: #7db348;
 
 html, body {
@@ -20,6 +20,7 @@ a {
   background: #DDD;
   height: 100%;
   padding-right: 1em;
+  z-index: 9;
 
   ul {
     list-style: none;
