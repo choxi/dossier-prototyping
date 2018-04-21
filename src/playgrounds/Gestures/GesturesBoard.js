@@ -56,7 +56,7 @@ export default class Board extends React.Component {
 
   isStylus(event) {
     return !(
-      event.target.className !== "Gestures__canvas" || (false && event.touches[0] && event.touches[0].touchType !== "stylus")
+      event.target.className !== "Board" || (false && event.touches[0] && event.touches[0].touchType !== "stylus")
     )
   }
 
@@ -101,12 +101,8 @@ export default class Board extends React.Component {
     if(currentGesture) {
       currentGesture = [ ...currentGesture, event.changedTouches[0] ]
       gestures = [ ...gestures, currentGesture ]
-      this.setState({ gestures: gestures, currentGesture: null }, () => {
-        this.detectGestures(this.state)
-      })
+      this.setState({ gestures: gestures, currentGesture: null }, () => this.detectGestures(this.state))
     }
-
-    console.log("stylus end")
   }
 
   detectGestures(state) {
@@ -129,10 +125,8 @@ export default class Board extends React.Component {
     let y4 = gestureB[gestureB.length - 1].clientY
 
     let coordinates = [
-      { x: x1, y: y1 }, 
-      { x: x2, y: y2 }, 
-      { x: x3, y: y3 },
-      { x: x4, y: y4 }
+      { x: x1, y: y1 }, { x: x2, y: y2 }, 
+      { x: x3, y: y3 }, { x: x4, y: y4 }
     ]
 
     if(findSegmentIntersection(coordinates)) {
@@ -221,13 +215,14 @@ export default class Board extends React.Component {
 
     let { width, height } = this.state.viewportDimensions
 
-    return <div 
-      onTouchStart={ event => this.handlePointerStart(event) }
-      onTouchMove={ event => this.handlePointer(event) }
-      onTouchEnd={ event => this.handlePointerEnd(event) }
-    > 
-      <div className="Board" ref={ this.boardRef }>
-        <canvas className="Gestures__canvas" ref={ this.canvas } width={ width } height={ height } />
+    return <div>
+      <canvas className="Gestures__canvas" ref={ this.canvas } width={ width } height={ height } />
+      <div className="Board" 
+        ref={ this.boardRef }
+        onTouchStart={ event => this.handlePointerStart(event) }
+        onTouchMove={ event => this.handlePointer(event) }
+        onTouchEnd={ event => this.handlePointerEnd(event) }
+      >
         { notes }
       </div>
     </div>
