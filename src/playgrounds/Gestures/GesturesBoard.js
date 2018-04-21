@@ -1,6 +1,7 @@
 import React from "react"
 import Hammer from "react-hammerjs"
 import { List } from "immutable"
+import { findIntersection, findSegmentIntersection } from "line-intersection"
 
 const sameSign = (a, b) => (a * b) > 0;
 
@@ -112,8 +113,8 @@ export default class Board extends React.Component {
     if(state.gestures.length < 2)
       return
 
-    let gestureA = state.gestures[0]
-    let gestureB = state.gestures[1]
+    let gestureA = state.gestures[state.gestures.length - 2]
+    let gestureB = state.gestures[state.gestures.length - 1]
 
     let x1 = gestureA[0].clientX
     let y1 = gestureA[0].clientY
@@ -127,57 +128,39 @@ export default class Board extends React.Component {
     let x4 = gestureB[gestureB.length - 1].clientX
     let y4 = gestureB[gestureB.length - 1].clientY
 
-    if(this.intersect(x1, y1, x2, y2, x3, y3, x4, y4))
-      console.log("intersect")
+    let coordinates = [
+      { x: x1, y: y1 }, 
+      { x: x2, y: y2 }, 
+      { x: x3, y: y3 },
+      { x: x4, y: y4 }
+    ]
+
+    if(findSegmentIntersection(coordinates)) {
+      let intersection = findIntersection(coordinates)
+      let targetNotes = this.findNotesAtCoord(state, intersection)
+      let newNotes = state.notes.filter(n => !targetNotes.some(tn => tn.id === n.id))
+      this.setState({ notes: newNotes }, () => {
+        let ctx = this.canvas.current.getContext("2d")
+        ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height)
+      })
+    }
   }
 
-  // https://gist.github.com/lengstrom/8499382
-  intersect(x1, y1, x2, y2, x3, y3, x4, y4){
-    var a1, a2, b1, b2, c1, c2;
-    var r1, r2 , r3, r4;
-    var denom, offset, num;
+  findNotesAtCoord(state, { x, y }) {
+    let notes = []
 
-    // Compute a1, b1, c1, where line joining points 1 and 2
-    // is "a1 x + b1 y + c1 = 0".
-    a1 = y2 - y1;
-    b1 = x1 - x2;
-    c1 = (x2 * y1) - (x1 * y2);
+    state.notes.forEach(note => {
+      let { clientWidth, clientHeight } = this.noteRefs[note.id].current.domElement
+      let minX = note.x
+      let maxX = note.x + clientWidth
+      let minY = note.y
+      let maxY = note.y + clientHeight
 
-    // Compute r3 and r4.
-    r3 = ((a1 * x3) + (b1 * y3) + c1);
-    r4 = ((a1 * x4) + (b1 * y4) + c1);
+      if(x > minX && x < maxX && y > minY && y < maxY)
+        notes.push(note)
+    })
 
-    // Check signs of r3 and r4. If both point 3 and point 4 lie on
-    // same side of line 1, the line segments do not intersect.
-    if ((r3 !== 0) && (r4 !== 0) && sameSign(r3, r4)){
-      return 0; //return that they do not intersect
-    }
-
-    // Compute a2, b2, c2
-    a2 = y4 - y3;
-    b2 = x3 - x4;
-    c2 = (x4 * y3) - (x3 * y4);
-
-    // Compute r1 and r2
-    r1 = (a2 * x1) + (b2 * y1) + c2;
-    r2 = (a2 * x2) + (b2 * y2) + c2;
-
-    // Check signs of r1 and r2. If both point 1 and point 2 lie
-    // on same side of second line segment, the line segments do
-    // not intersect.
-    if ((r1 !== 0) && (r2 !== 0) && (sameSign(r1, r2))){
-      return 0; //return that they do not intersect
-    }
-
-    //Line segments intersect: compute intersection point.
-    denom = (a1 * b2) - (a2 * b1);
-
-    if (denom === 0) {
-      return 1; //collinear
-    }
-
-    // lines_intersect
-    return 1; //lines intersect, return true
+    return notes
   }
 
   noteInBounds(note) {
